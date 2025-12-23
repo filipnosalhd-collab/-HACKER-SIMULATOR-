@@ -1,988 +1,920 @@
 <!DOCTYPE html>
 <html lang="pl">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Hacker Simulator</title>
     <style>
-      * {
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;
-      }
-
-      body {
-        font-family: "Courier New", monospace;
-        background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 100%);
-        color: #00ff00;
-        overflow-x: hidden;
-        min-height: 100vh;
-      }
-
-      .container {
-        max-width: 1400px;
-        margin: 0 auto;
-        padding: 20px;
-      }
-
-      .header {
-        text-align: center;
-        padding: 20px;
-        background: rgba(0, 0, 0, 0.5);
-        border: 2px solid #00ff00;
-        margin-bottom: 20px;
-        box-shadow: 0 0 20px rgba(0, 255, 0, 0.3);
-      }
-
-      .header h1 {
-        font-size: clamp(24px, 5vw, 48px);
-        text-shadow: 0 0 10px #00ff00;
-        margin-bottom: 10px;
-      }
-
-      .mission-info {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-        gap: 15px;
-        margin-bottom: 20px;
-      }
-
-      .info-box {
-        background: rgba(0, 0, 0, 0.7);
-        border: 2px solid #00ff00;
-        padding: 15px;
-        text-align: center;
-        box-shadow: 0 0 15px rgba(0, 255, 0, 0.2);
-      }
-
-      .info-box h3 {
-        font-size: 14px;
-        color: #00ff00;
-        margin-bottom: 5px;
-      }
-
-      .info-box p {
-        font-size: clamp(18px, 3vw, 24px);
-        font-weight: bold;
-      }
-
-      .game-area {
-        display: grid;
-        grid-template-columns: 1fr;
-        gap: 20px;
-      }
-
-      @media (min-width: 1024px) {
-        .game-area {
-          grid-template-columns: 1fr 400px;
-        }
-      }
-
-      .laptop-container {
-        background: rgba(0, 0, 0, 0.8);
-        border: 3px solid #00ff00;
-        padding: 20px;
-        min-height: 500px;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        box-shadow: 0 0 30px rgba(0, 255, 0, 0.3);
-        position: relative;
-      }
-
-      .laptop-3d {
-        width: 100%;
-        max-width: 500px;
-        height: 300px;
-        perspective: 1000px;
-        margin-bottom: 20px;
-      }
-
-      .laptop-inner {
-        width: 100%;
-        height: 100%;
-        position: relative;
-        transform-style: preserve-3d;
-        animation: rotateIntro 3s ease-out;
-      }
-
-      @keyframes rotateIntro {
-        0% {
-          transform: rotateY(90deg);
-        }
-        100% {
-          transform: rotateY(0deg);
-        }
-      }
-
-      .laptop-screen {
-        width: 100%;
-        height: 80%;
-        background: linear-gradient(135deg, #1a1a1a 0%, #0a0a0a 100%);
-        border: 3px solid #333;
-        border-radius: 5px 5px 0 0;
-        position: absolute;
-        top: 0;
-        box-shadow: inset 0 0 30px rgba(0, 255, 0, 0.1);
-        display: flex;
-        flex-direction: column;
-        padding: 10px;
-      }
-
-      .laptop-base {
-        width: 105%;
-        height: 20%;
-        background: linear-gradient(135deg, #2a2a2a 0%, #1a1a1a 100%);
-        border: 2px solid #333;
-        position: absolute;
-        bottom: 0;
-        left: -2.5%;
-        border-radius: 0 0 5px 5px;
-        box-shadow: 0 5px 20px rgba(0, 0, 0, 0.5);
-      }
-
-      .screen-content {
-        flex: 1;
-        overflow-y: auto;
-        font-size: clamp(10px, 2vw, 14px);
-        line-height: 1.4;
-      }
-
-      .screen-content::-webkit-scrollbar {
-        width: 8px;
-      }
-
-      .screen-content::-webkit-scrollbar-track {
-        background: #0a0a0a;
-      }
-
-      .screen-content::-webkit-scrollbar-thumb {
-        background: #00ff00;
-        border-radius: 4px;
-      }
-
-      .code-line {
-        margin: 2px 0;
-        padding: 2px 5px;
-        animation: typeLine 0.3s ease-out;
-      }
-
-      @keyframes typeLine {
-        from {
-          opacity: 0;
-          transform: translateX(-10px);
-        }
-        to {
-          opacity: 1;
-          transform: translateX(0);
-        }
-      }
-
-      .command-prompt {
-        color: #00ff00;
-        font-weight: bold;
-      }
-
-      .code-highlight {
-        background: rgba(255, 255, 0, 0.2);
-        color: #ffff00;
-        font-weight: bold;
-      }
-
-      .keys-display {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 10px;
-        justify-content: center;
-        margin: 20px 0;
-        padding: 20px;
-        background: rgba(0, 255, 0, 0.1);
-        border: 2px solid #00ff00;
-        border-radius: 10px;
-      }
-
-      .key {
-        background: linear-gradient(135deg, #00ff00 0%, #00cc00 100%);
-        color: #000;
-        padding: 15px 20px;
-        border-radius: 8px;
-        font-size: clamp(18px, 3vw, 24px);
-        font-weight: bold;
-        box-shadow: 0 4px 10px rgba(0, 255, 0, 0.5);
-        animation: keyPulse 1s infinite;
-        min-width: 60px;
-        text-align: center;
-      }
-
-      @keyframes keyPulse {
-        0%,
-        100% {
-          transform: scale(1);
-        }
-        50% {
-          transform: scale(1.05);
-        }
-      }
-
-      .input-area {
-        width: 100%;
-        margin-top: 20px;
-      }
-
-      .input-display {
-        background: rgba(0, 0, 0, 0.8);
-        border: 2px solid #00ff00;
-        padding: 15px;
-        margin-bottom: 10px;
-        min-height: 50px;
-        font-size: clamp(16px, 2.5vw, 20px);
-        text-align: center;
-        border-radius: 5px;
-        word-break: break-all;
-        text-transform: none !important;
-        font-variant: normal !important;
-      }
-
-      .keyboard {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(50px, 1fr));
-        gap: 5px;
-        margin-bottom: 10px;
-      }
-
-      .key-button {
-        background: linear-gradient(135deg, #1a1a1a 0%, #2a2a2a 100%);
-        border: 2px solid #00ff00;
-        color: #00ff00;
-        padding: 15px;
-        font-size: clamp(14px, 2vw, 18px);
-        font-family: "Courier New", monospace;
-        cursor: pointer;
-        border-radius: 5px;
-        transition: all 0.2s;
-        font-weight: bold;
-      }
-
-      .key-button:hover {
-        background: linear-gradient(135deg, #00ff00 0%, #00cc00 100%);
-        color: #000;
-        transform: translateY(-2px);
-        box-shadow: 0 4px 10px rgba(0, 255, 0, 0.5);
-      }
-
-      .key-button:active {
-        transform: translateY(0);
-      }
-
-      .action-buttons {
-        display: flex;
-        gap: 10px;
-        margin-top: 10px;
-        flex-wrap: wrap;
-      }
-
-      .btn {
-        flex: 1;
-        min-width: 120px;
-        padding: 15px;
-        font-size: clamp(14px, 2vw, 18px);
-        font-family: "Courier New", monospace;
-        font-weight: bold;
-        border: 2px solid #00ff00;
-        background: linear-gradient(135deg, #1a1a1a 0%, #2a2a2a 100%);
-        color: #00ff00;
-        cursor: pointer;
-        border-radius: 5px;
-        transition: all 0.3s;
-      }
-
-      .btn:hover {
-        background: linear-gradient(135deg, #00ff00 0%, #00cc00 100%);
-        color: #000;
-        transform: translateY(-2px);
-        box-shadow: 0 5px 15px rgba(0, 255, 0, 0.5);
-      }
-
-      .btn:disabled {
-        opacity: 0.5;
-        cursor: not-allowed;
-        transform: none;
-      }
-
-      .sidebar {
-        display: flex;
-        flex-direction: column;
-        gap: 20px;
-      }
-
-      .target-info {
-        background: rgba(0, 0, 0, 0.8);
-        border: 3px solid #ff0000;
-        padding: 20px;
-        box-shadow: 0 0 20px rgba(255, 0, 0, 0.3);
-      }
-
-      .target-info h2 {
-        color: #ff0000;
-        margin-bottom: 15px;
-        font-size: clamp(20px, 3vw, 28px);
-        text-shadow: 0 0 10px #ff0000;
-      }
-
-      .target-detail {
-        margin: 10px 0;
-        padding: 10px;
-        background: rgba(255, 0, 0, 0.1);
-        border-left: 3px solid #ff0000;
-      }
-
-      .target-detail strong {
-        color: #ff0000;
-      }
-
-      .stats-panel {
-        background: rgba(0, 0, 0, 0.8);
-        border: 3px solid #00ffff;
-        padding: 20px;
-        box-shadow: 0 0 20px rgba(0, 255, 255, 0.3);
-      }
-
-      .stats-panel h2 {
-        color: #00ffff;
-        margin-bottom: 15px;
-        font-size: clamp(20px, 3vw, 28px);
-        text-shadow: 0 0 10px #00ffff;
-      }
-
-      .stat-item {
-        margin: 10px 0;
-        padding: 10px;
-        background: rgba(0, 255, 255, 0.1);
-        border-left: 3px solid #00ffff;
-      }
-
-      .stat-item strong {
-        color: #00ffff;
-      }
-
-      .progress-bar {
-        width: 100%;
-        height: 20px;
-        background: rgba(0, 0, 0, 0.5);
-        border: 2px solid #00ff00;
-        margin-top: 10px;
-        border-radius: 10px;
-        overflow: hidden;
-      }
-
-      .progress-fill {
-        height: 100%;
-        background: linear-gradient(90deg, #00ff00 0%, #00cc00 100%);
-        transition: width 0.5s ease-out;
-        box-shadow: 0 0 10px rgba(0, 255, 0, 0.5);
-      }
-
-      .timer {
-        font-size: clamp(24px, 4vw, 36px);
-        font-weight: bold;
-        text-align: center;
-        padding: 15px;
-        background: rgba(0, 0, 0, 0.8);
-        border: 3px solid #ffff00;
-        margin-top: 10px;
-        color: #ffff00;
-        text-shadow: 0 0 10px #ffff00;
-        border-radius: 5px;
-      }
-
-      .message {
-        position: fixed;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        background: rgba(0, 0, 0, 0.95);
-        border: 4px solid #00ff00;
-        padding: 40px;
-        font-size: clamp(20px, 3vw, 32px);
-        font-weight: bold;
-        z-index: 1000;
-        text-align: center;
-        box-shadow: 0 0 50px rgba(0, 255, 0, 0.5);
-        animation: messagePopIn 0.5s ease-out;
-        max-width: 90%;
-      }
-
-      @keyframes messagePopIn {
-        from {
-          transform: translate(-50%, -50%) scale(0);
-        }
-        to {
-          transform: translate(-50%, -50%) scale(1);
-        }
-      }
-
-      .message.error {
-        border-color: #ff0000;
-        color: #ff0000;
-        box-shadow: 0 0 50px rgba(255, 0, 0, 0.5);
-      }
-
-      .message.success {
-        border-color: #00ff00;
-        color: #00ff00;
-      }
-
-      .phase-indicator {
-        text-align: center;
-        font-size: clamp(18px, 2.5vw, 24px);
-        padding: 15px;
-        background: rgba(0, 0, 0, 0.8);
-        border: 2px solid #00ff00;
-        margin-bottom: 15px;
-        font-weight: bold;
-        animation: phasePulse 2s infinite;
-      }
-
-      @keyframes phasePulse {
-        0%,
-        100% {
-          box-shadow: 0 0 10px rgba(0, 255, 0, 0.3);
-        }
-        50% {
-          box-shadow: 0 0 25px rgba(0, 255, 0, 0.6);
-        }
-      }
-
-      @media (max-width: 768px) {
-        .keyboard {
-          grid-template-columns: repeat(auto-fit, minmax(40px, 1fr));
-          gap: 3px;
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
 
-        .key-button {
-          padding: 10px;
-          font-size: 14px;
+        body {
+            font-family: 'Courier New', monospace;
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 100%);
+            color: #00ff00;
+            overflow-x: hidden;
+            min-height: 100vh;
         }
 
         .container {
-          padding: 10px;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
         }
-      }
 
-      /* Efekty policji */
-      .police-overlay {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        pointer-events: none;
-        z-index: 9999;
-        animation: policeLights 0.5s infinite;
-      }
-
-      @keyframes policeLights {
-        0%,
-        50% {
-          background: rgba(255, 0, 0, 0.3);
-          box-shadow: inset 0 0 100px rgba(255, 0, 0, 0.5);
+        .header {
+            text-align: center;
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.5);
+            border: 2px solid #00ff00;
+            margin-bottom: 20px;
+            box-shadow: 0 0 20px rgba(0, 255, 0, 0.3);
         }
-        51%,
-        100% {
-          background: rgba(0, 0, 255, 0.3);
-          box-shadow: inset 0 0 100px rgba(0, 0, 255, 0.5);
+
+        .header h1 {
+            font-size: clamp(24px, 5vw, 48px);
+            text-shadow: 0 0 10px #00ff00;
+            margin-bottom: 10px;
         }
-      }
 
-      .forgot-btn {
-        background: linear-gradient(135deg, #ff6600 0%, #cc3300 100%);
-        border: 2px solid #ff6600;
-        color: #fff;
-        padding: 10px 20px;
-        font-size: 14px;
-        font-family: "Courier New", monospace;
-        cursor: pointer;
-        border-radius: 5px;
-        margin-top: 10px;
-        transition: all 0.3s;
-      }
-
-      .forgot-btn:hover {
-        background: linear-gradient(135deg, #ff3300 0%, #990000 100%);
-        box-shadow: 0 0 15px rgba(255, 0, 0, 0.5);
-      }
-
-      /* Ostrzeżenie na starcie */
-      .warning-overlay {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: rgba(0, 0, 0, 0.95);
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-        z-index: 99999;
-        color: #ff0000;
-        text-align: center;
-        padding: 20px;
-      }
-
-      .warning-overlay h1 {
-        font-size: clamp(48px, 10vw, 100px);
-        text-shadow: 0 0 20px #ff0000;
-        margin-bottom: 30px;
-        animation: warningPulse 1s infinite;
-      }
-
-      .warning-overlay p {
-        font-size: clamp(16px, 3vw, 24px);
-        color: #ffff00;
-        max-width: 600px;
-        line-height: 1.6;
-        margin-bottom: 40px;
-      }
-
-      .warning-overlay .start-btn {
-        background: linear-gradient(135deg, #00ff00 0%, #00aa00 100%);
-        border: none;
-        color: #000;
-        padding: 20px 60px;
-        font-size: 24px;
-        font-family: "Courier New", monospace;
-        font-weight: bold;
-        cursor: pointer;
-        border-radius: 10px;
-        transition: all 0.3s;
-      }
-
-      .warning-overlay .start-btn:hover {
-        transform: scale(1.1);
-        box-shadow: 0 0 30px rgba(0, 255, 0, 0.5);
-      }
-
-      @keyframes warningPulse {
-        0%,
-        100% {
-          opacity: 1;
+        .mission-info {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
         }
-        50% {
-          opacity: 0.5;
+
+        .info-box {
+            background: rgba(0, 0, 0, 0.7);
+            border: 2px solid #00ff00;
+            padding: 15px;
+            text-align: center;
+            box-shadow: 0 0 15px rgba(0, 255, 0, 0.2);
         }
-      }
+
+        .info-box h3 {
+            font-size: 14px;
+            color: #00ff00;
+            margin-bottom: 5px;
+        }
+
+        .info-box p {
+            font-size: clamp(18px, 3vw, 24px);
+            font-weight: bold;
+        }
+
+        .game-area {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 20px;
+        }
+
+        @media (min-width: 1024px) {
+            .game-area {
+                grid-template-columns: 1fr 400px;
+            }
+        }
+
+        .laptop-container {
+            background: rgba(0, 0, 0, 0.8);
+            border: 3px solid #00ff00;
+            padding: 20px;
+            min-height: 500px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 0 30px rgba(0, 255, 0, 0.3);
+            position: relative;
+        }
+
+        .laptop-3d {
+            width: 100%;
+            max-width: 500px;
+            height: 300px;
+            perspective: 1000px;
+            margin-bottom: 20px;
+        }
+
+        .laptop-inner {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            transform-style: preserve-3d;
+            animation: rotateIntro 3s ease-out;
+        }
+
+        @keyframes rotateIntro {
+            0% { transform: rotateY(90deg); }
+            100% { transform: rotateY(0deg); }
+        }
+
+        .laptop-screen {
+            width: 100%;
+            height: 80%;
+            background: linear-gradient(135deg, #1a1a1a 0%, #0a0a0a 100%);
+            border: 3px solid #333;
+            border-radius: 5px 5px 0 0;
+            position: absolute;
+            top: 0;
+            box-shadow: inset 0 0 30px rgba(0, 255, 0, 0.1);
+            display: flex;
+            flex-direction: column;
+            padding: 10px;
+        }
+
+        .laptop-base {
+            width: 105%;
+            height: 20%;
+            background: linear-gradient(135deg, #2a2a2a 0%, #1a1a1a 100%);
+            border: 2px solid #333;
+            position: absolute;
+            bottom: 0;
+            left: -2.5%;
+            border-radius: 0 0 5px 5px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.5);
+        }
+
+        .screen-content {
+            flex: 1;
+            overflow-y: auto;
+            font-size: clamp(10px, 2vw, 14px);
+            line-height: 1.4;
+        }
+
+        .screen-content::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .screen-content::-webkit-scrollbar-track {
+            background: #0a0a0a;
+        }
+
+        .screen-content::-webkit-scrollbar-thumb {
+            background: #00ff00;
+            border-radius: 4px;
+        }
+
+        .code-line {
+            margin: 2px 0;
+            padding: 2px 5px;
+            animation: typeLine 0.3s ease-out;
+        }
+
+        @keyframes typeLine {
+            from { opacity: 0; transform: translateX(-10px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        .command-prompt {
+            color: #00ff00;
+            font-weight: bold;
+        }
+
+        .code-highlight {
+            background: rgba(255, 255, 0, 0.2);
+            color: #ffff00;
+            font-weight: bold;
+        }
+
+        .keys-display {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+            margin: 20px 0;
+            padding: 20px;
+            background: rgba(0, 255, 0, 0.1);
+            border: 2px solid #00ff00;
+            border-radius: 10px;
+        }
+
+        .key {
+            background: linear-gradient(135deg, #00ff00 0%, #00cc00 100%);
+            color: #000;
+            padding: 15px 20px;
+            border-radius: 8px;
+            font-size: clamp(18px, 3vw, 24px);
+            font-weight: bold;
+            box-shadow: 0 4px 10px rgba(0, 255, 0, 0.5);
+            animation: keyPulse 1s infinite;
+            min-width: 60px;
+            text-align: center;
+        }
+
+        @keyframes keyPulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        .input-area {
+            width: 100%;
+            margin-top: 20px;
+        }
+
+        .input-display {
+            background: rgba(0, 0, 0, 0.8);
+            border: 2px solid #00ff00;
+            padding: 15px;
+            margin-bottom: 10px;
+            min-height: 50px;
+            font-size: clamp(16px, 2.5vw, 20px);
+            text-align: center;
+            border-radius: 5px;
+            word-break: break-all;
+            text-transform: none !important;
+            font-variant: normal !important;
+        }
+
+        .keyboard {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(50px, 1fr));
+            gap: 5px;
+            margin-bottom: 10px;
+        }
+
+        .key-button {
+            background: linear-gradient(135deg, #1a1a1a 0%, #2a2a2a 100%);
+            border: 2px solid #00ff00;
+            color: #00ff00;
+            padding: 15px;
+            font-size: clamp(14px, 2vw, 18px);
+            font-family: 'Courier New', monospace;
+            cursor: pointer;
+            border-radius: 5px;
+            transition: all 0.2s;
+            font-weight: bold;
+        }
+
+        .key-button:hover {
+            background: linear-gradient(135deg, #00ff00 0%, #00cc00 100%);
+            color: #000;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(0, 255, 0, 0.5);
+        }
+
+        .key-button:active {
+            transform: translateY(0);
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            flex: 1;
+            min-width: 120px;
+            padding: 15px;
+            font-size: clamp(14px, 2vw, 18px);
+            font-family: 'Courier New', monospace;
+            font-weight: bold;
+            border: 2px solid #00ff00;
+            background: linear-gradient(135deg, #1a1a1a 0%, #2a2a2a 100%);
+            color: #00ff00;
+            cursor: pointer;
+            border-radius: 5px;
+            transition: all 0.3s;
+        }
+
+        .btn:hover {
+            background: linear-gradient(135deg, #00ff00 0%, #00cc00 100%);
+            color: #000;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 255, 0, 0.5);
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .target-info {
+            background: rgba(0, 0, 0, 0.8);
+            border: 3px solid #ff0000;
+            padding: 20px;
+            box-shadow: 0 0 20px rgba(255, 0, 0, 0.3);
+        }
+
+        .target-info h2 {
+            color: #ff0000;
+            margin-bottom: 15px;
+            font-size: clamp(20px, 3vw, 28px);
+            text-shadow: 0 0 10px #ff0000;
+        }
+
+        .target-detail {
+            margin: 10px 0;
+            padding: 10px;
+            background: rgba(255, 0, 0, 0.1);
+            border-left: 3px solid #ff0000;
+        }
+
+        .target-detail strong {
+            color: #ff0000;
+        }
+
+        .stats-panel {
+            background: rgba(0, 0, 0, 0.8);
+            border: 3px solid #00ffff;
+            padding: 20px;
+            box-shadow: 0 0 20px rgba(0, 255, 255, 0.3);
+        }
+
+        .stats-panel h2 {
+            color: #00ffff;
+            margin-bottom: 15px;
+            font-size: clamp(20px, 3vw, 28px);
+            text-shadow: 0 0 10px #00ffff;
+        }
+
+        .stat-item {
+            margin: 10px 0;
+            padding: 10px;
+            background: rgba(0, 255, 255, 0.1);
+            border-left: 3px solid #00ffff;
+        }
+
+        .stat-item strong {
+            color: #00ffff;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 20px;
+            background: rgba(0, 0, 0, 0.5);
+            border: 2px solid #00ff00;
+            margin-top: 10px;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #00ff00 0%, #00cc00 100%);
+            transition: width 0.5s ease-out;
+            box-shadow: 0 0 10px rgba(0, 255, 0, 0.5);
+        }
+
+        .timer {
+            font-size: clamp(24px, 4vw, 36px);
+            font-weight: bold;
+            text-align: center;
+            padding: 15px;
+            background: rgba(0, 0, 0, 0.8);
+            border: 3px solid #ffff00;
+            margin-top: 10px;
+            color: #ffff00;
+            text-shadow: 0 0 10px #ffff00;
+            border-radius: 5px;
+        }
+
+        .message {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0, 0, 0, 0.95);
+            border: 4px solid #00ff00;
+            padding: 40px;
+            font-size: clamp(20px, 3vw, 32px);
+            font-weight: bold;
+            z-index: 1000;
+            text-align: center;
+            box-shadow: 0 0 50px rgba(0, 255, 0, 0.5);
+            animation: messagePopIn 0.5s ease-out;
+            max-width: 90%;
+        }
+
+        @keyframes messagePopIn {
+            from { transform: translate(-50%, -50%) scale(0); }
+            to { transform: translate(-50%, -50%) scale(1); }
+        }
+
+        .message.error {
+            border-color: #ff0000;
+            color: #ff0000;
+            box-shadow: 0 0 50px rgba(255, 0, 0, 0.5);
+        }
+
+        .message.success {
+            border-color: #00ff00;
+            color: #00ff00;
+        }
+
+        .phase-indicator {
+            text-align: center;
+            font-size: clamp(18px, 2.5vw, 24px);
+            padding: 15px;
+            background: rgba(0, 0, 0, 0.8);
+            border: 2px solid #00ff00;
+            margin-bottom: 15px;
+            font-weight: bold;
+            animation: phasePulse 2s infinite;
+        }
+
+        @keyframes phasePulse {
+            0%, 100% { box-shadow: 0 0 10px rgba(0, 255, 0, 0.3); }
+            50% { box-shadow: 0 0 25px rgba(0, 255, 0, 0.6); }
+        }
+
+        @media (max-width: 768px) {
+            .keyboard {
+                grid-template-columns: repeat(auto-fit, minmax(40px, 1fr));
+                gap: 3px;
+            }
+
+            .key-button {
+                padding: 10px;
+                font-size: 14px;
+            }
+
+            .container {
+                padding: 10px;
+            }
+        }
+
+        /* Efekty policji */
+        .police-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 9999;
+            animation: policeLights 0.5s infinite;
+        }
+
+        @keyframes policeLights {
+            0%, 50% { 
+                background: rgba(255, 0, 0, 0.3);
+                box-shadow: inset 0 0 100px rgba(255, 0, 0, 0.5);
+            }
+            51%, 100% { 
+                background: rgba(0, 0, 255, 0.3);
+                box-shadow: inset 0 0 100px rgba(0, 0, 255, 0.5);
+            }
+        }
+
+        .forgot-btn {
+            background: linear-gradient(135deg, #ff6600 0%, #cc3300 100%);
+            border: 2px solid #ff6600;
+            color: #fff;
+            padding: 10px 20px;
+            font-size: 14px;
+            font-family: 'Courier New', monospace;
+            cursor: pointer;
+            border-radius: 5px;
+            margin-top: 10px;
+            transition: all 0.3s;
+        }
+
+        .forgot-btn:hover {
+            background: linear-gradient(135deg, #ff3300 0%, #990000 100%);
+            box-shadow: 0 0 15px rgba(255, 0, 0, 0.5);
+        }
+
+        /* Ostrzeżenie na starcie */
+        .warning-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.95);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 99999;
+            color: #ff0000;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .warning-overlay h1 {
+            font-size: clamp(48px, 10vw, 100px);
+            text-shadow: 0 0 20px #ff0000;
+            margin-bottom: 30px;
+            animation: warningPulse 1s infinite;
+        }
+
+        .warning-overlay p {
+            font-size: clamp(16px, 3vw, 24px);
+            color: #ffff00;
+            max-width: 600px;
+            line-height: 1.6;
+            margin-bottom: 40px;
+        }
+
+        .warning-overlay .start-btn {
+            background: linear-gradient(135deg, #00ff00 0%, #00aa00 100%);
+            border: none;
+            color: #000;
+            padding: 20px 60px;
+            font-size: 24px;
+            font-family: 'Courier New', monospace;
+            font-weight: bold;
+            cursor: pointer;
+            border-radius: 10px;
+            transition: all 0.3s;
+        }
+
+        .warning-overlay .start-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 0 30px rgba(0, 255, 0, 0.5);
+        }
+
+        @keyframes warningPulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
     </style>
-  </head>
-  <body>
+</head>
+<body>
     <!-- Ostrzeżenie na starcie -->
     <div class="warning-overlay" id="warningOverlay">
-      <h1>⚠️ UWAGA ⚠️</h1>
-      <p>
-        Ta gra zawiera <strong>MIGAJĄCE ŚWIATŁA</strong> (czerwono-niebieskie
-        efekty policji) oraz <strong>GŁOŚNE DŹWIĘKI</strong> (syrena
-        policyjna).<br /><br />
-        Jeśli masz epilepsję lub jesteś wrażliwy na tego typu efekty, zachowaj
-        ostrożność.
-      </p>
-      <button class="start-btn" id="startGameBtn">▶ ROZPOCZNIJ GRĘ</button>
+        <h1>⚠️ UWAGA ⚠️</h1>
+        <p>
+            Ta gra zawiera <strong>MIGAJĄCE ŚWIATŁA</strong> (czerwono-niebieskie efekty policji) 
+            oraz <strong>GŁOŚNE DŹWIĘKI</strong> (syrena policyjna).<br><br>
+            Jeśli masz epilepsję lub jesteś wrażliwy na tego typu efekty, zachowaj ostrożność.
+        </p>
+        <button class="start-btn" id="startGameBtn">▶ ROZPOCZNIJ GRĘ</button>
     </div>
 
     <div class="container">
-      <div class="header">
-        <h1>🔐 HACKER SIMULATOR 🔐</h1>
-        <p>Zhakuj 500 celów i zostań legendą!</p>
-      </div>
-
-      <div class="mission-info">
-        <div class="info-box">
-          <h3>MISJA</h3>
-          <p id="currentMission">1/500</p>
-        </div>
-        <div class="info-box">
-          <h3>POSTĘP</h3>
-          <p id="progressPercent">0%</p>
-        </div>
-        <div class="info-box">
-          <h3>PRÓBY</h3>
-          <p id="attempts">0</p>
-        </div>
-        <div class="info-box">
-          <h3>CZAS GRY</h3>
-          <p id="totalTime">0:00</p>
-        </div>
-      </div>
-
-      <div class="game-area">
-        <div class="laptop-container">
-          <div class="laptop-3d">
-            <div class="laptop-inner">
-              <div class="laptop-screen">
-                <div class="screen-content" id="terminalOutput"></div>
-              </div>
-              <div class="laptop-base"></div>
-            </div>
-          </div>
-
-          <div class="phase-indicator" id="phaseIndicator">
-            ŁADOWANIE SYSTEMU...
-          </div>
-
-          <div
-            id="keysDisplay"
-            class="keys-display"
-            style="display: none"
-          ></div>
-
-          <div
-            id="readyButton"
-            style="display: none; text-align: center; margin: 20px 0"
-          >
-            <button
-              class="btn"
-              id="btnReady"
-              style="font-size: 24px; padding: 20px 40px"
-            >
-              ✓ JESTEM GOTOWY!
-            </button>
-          </div>
-
-          <div class="input-area" id="inputArea" style="display: none">
-            <div
-              class="input-display"
-              id="inputDisplay"
-              style="text-transform: none !important"
-            ></div>
-            <div class="keyboard" id="keyboard"></div>
-            <div class="action-buttons">
-              <button class="btn" id="backspaceBtn">← BACKSPACE</button>
-              <button class="btn" id="submitBtn">✓ WYŚLIJ</button>
-              <button class="btn" id="clearBtn">✗ WYCZYŚĆ</button>
-            </div>
-            <div
-              id="forgotBtnContainer"
-              style="text-align: center; display: none"
-            >
-              <button class="forgot-btn" id="forgotBtn">❓ NIE PAMIĘTAM</button>
-            </div>
-          </div>
-
-          <div id="timerDisplay" class="timer" style="display: none"></div>
+        <div class="header">
+            <h1>🔐 HACKER SIMULATOR 🔐</h1>
+            <p>Zhakuj 100 celów i zostań legendą!</p>
         </div>
 
-        <div class="sidebar">
-          <div class="target-info">
-            <h2>🎯 CEL MISJI</h2>
-            <div class="target-detail">
-              <strong>TYP:</strong> <span id="targetType">---</span>
+        <div class="mission-info">
+            <div class="info-box">
+                <h3>MISJA</h3>
+                <p id="currentMission">1/500</p>
             </div>
-            <div class="target-detail">
-              <strong>TRUDNOŚĆ:</strong> <span id="difficulty">---</span>
+            <div class="info-box">
+                <h3>POSTĘP</h3>
+                <p id="progressPercent">0%</p>
             </div>
-            <div class="target-detail">
-              <strong>KLAWISZE:</strong> <span id="keysCount">---</span>
+            <div class="info-box">
+                <h3>PRÓBY</h3>
+                <p id="attempts">0</p>
             </div>
-            <div class="target-detail">
-              <strong>RUNDY KODU:</strong> <span id="codeRounds">---</span>
+            <div class="info-box">
+                <h3>CZAS GRY</h3>
+                <p id="totalTime">0:00</p>
             </div>
-            <div class="target-detail">
-              <strong>LIMIT CZASU:</strong> <span id="timeLimit">---</span>
-            </div>
-          </div>
-
-          <div class="stats-panel">
-            <h2>📊 STATYSTYKI</h2>
-            <div class="stat-item">
-              <strong>UKOŃCZONE:</strong> <span id="completed">0</span>
-            </div>
-            <div class="stat-item">
-              <strong>SUKCES:</strong> <span id="successRate">0%</span>
-            </div>
-            <div class="stat-item">
-              <strong>ŚREDNI CZAS:</strong> <span id="avgTime">0s</span>
-            </div>
-            <div class="stat-item">
-              <strong>NAGRODY:</strong> <span id="rewards">0 🏆</span>
-            </div>
-            <div class="progress-bar">
-              <div
-                class="progress-fill"
-                id="progressFill"
-                style="width: 0%"
-              ></div>
-            </div>
-          </div>
         </div>
-      </div>
+
+        <div class="game-area">
+            <div class="laptop-container">
+                <div class="laptop-3d">
+                    <div class="laptop-inner">
+                        <div class="laptop-screen">
+                            <div class="screen-content" id="terminalOutput"></div>
+                        </div>
+                        <div class="laptop-base"></div>
+                    </div>
+                </div>
+
+                <div class="phase-indicator" id="phaseIndicator">
+                    ŁADOWANIE SYSTEMU...
+                </div>
+
+                <div id="keysDisplay" class="keys-display" style="display: none;"></div>
+
+                <div id="readyButton" style="display: none; text-align: center; margin: 20px 0;">
+                    <button class="btn" id="btnReady" style="font-size: 24px; padding: 20px 40px;">
+                        ✓ JESTEM GOTOWY!
+                    </button>
+                </div>
+
+                <div class="input-area" id="inputArea" style="display: none;">
+                    <div class="input-display" id="inputDisplay" style="text-transform: none !important;"></div>
+                    <div class="keyboard" id="keyboard"></div>
+                    <div class="action-buttons">
+                        <button class="btn" id="backspaceBtn">← BACKSPACE</button>
+                        <button class="btn" id="submitBtn">✓ WYŚLIJ</button>
+                        <button class="btn" id="clearBtn">✗ WYCZYŚĆ</button>
+                    </div>
+                    <div id="forgotBtnContainer" style="text-align: center; display: none;">
+                        <button class="forgot-btn" id="forgotBtn">❓ NIE PAMIĘTAM</button>
+                    </div>
+                </div>
+
+                <div id="timerDisplay" class="timer" style="display: none;"></div>
+            </div>
+
+            <div class="sidebar">
+                <div class="target-info">
+                    <h2>🎯 CEL MISJI</h2>
+                    <div class="target-detail">
+                        <strong>TYP:</strong> <span id="targetType">---</span>
+                    </div>
+                    <div class="target-detail">
+                        <strong>TRUDNOŚĆ:</strong> <span id="difficulty">---</span>
+                    </div>
+                    <div class="target-detail">
+                        <strong>KLAWISZE:</strong> <span id="keysCount">---</span>
+                    </div>
+                    <div class="target-detail">
+                        <strong>RUNDY KODU:</strong> <span id="codeRounds">---</span>
+                    </div>
+                    <div class="target-detail">
+                        <strong>LIMIT CZASU:</strong> <span id="timeLimit">---</span>
+                    </div>
+                </div>
+
+                <div class="stats-panel">
+                    <h2>📊 STATYSTYKI</h2>
+                    <div class="stat-item">
+                        <strong>UKOŃCZONE:</strong> <span id="completed">0</span>
+                    </div>
+                    <div class="stat-item">
+                        <strong>SUKCES:</strong> <span id="successRate">0%</span>
+                    </div>
+                    <div class="stat-item">
+                        <strong>ŚREDNI CZAS:</strong> <span id="avgTime">0s</span>
+                    </div>
+                    <div class="stat-item">
+                        <strong>NAGRODY:</strong> <span id="rewards">0 🏆</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progressFill" style="width: 0%"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 
     <script>
-      const TOTAL_MISSIONS = 500;
-      const TUTORIAL_MISSIONS = 5;
-
-      // Każdy cel ma swoją bazową trudność (1-10)
-      const targetTypes = {
-        SERWER: { baseDifficulty: 1, name: "SERWER" },
-        ROUTER: { baseDifficulty: 2, name: "ROUTER" },
-        KAMERA: { baseDifficulty: 3, name: "KAMERA" },
-        TERMINAL: { baseDifficulty: 4, name: "TERMINAL" },
-        DRZWI: { baseDifficulty: 5, name: "DRZWI" },
-        FIREWALL: { baseDifficulty: 6, name: "FIREWALL" },
-        "BAZA DANYCH": { baseDifficulty: 7, name: "BAZA DANYCH" },
-        SEJF: { baseDifficulty: 8, name: "SEJF" },
-        BANK: { baseDifficulty: 9, name: "BANK" },
-        PENTAGON: { baseDifficulty: 10, name: "PENTAGON" },
-      };
-
-      const targetTypesList = Object.keys(targetTypes);
-
-      const codeTemplates = {
-        bash: [
-          "chmod 777 /door",
-          "ssh admin@target",
-          "cat /etc/shadow",
-          "rm -rf /var/log",
-          "service firewall stop",
-          "systemctl disable sec",
-          "iptables -f",
-          "kill -9 1234",
-          "mount /dev/sdb1",
-          "grep root /etc",
-        ],
-        python: [
-          "import socket",
-          's.connect(("target"))',
-          'os.system("rm -rf")',
-          "requests.post(url)",
-          "subprocess.call(cmd)",
-          "json.loads(data)",
-          'exec(open("x.py"))',
-          "hashlib.md5(pass)",
-          "pickle.loads(data)",
-          "sys.exit(0)",
-        ],
-        javascript: [
-          'fetch("/api/unlock")',
-          'document.cookie="x"',
-          "localstorage.setitem(k)",
-          "eval(atob(payload))",
-          "settimeout(hack)",
-          "console.log(btoa(d))",
-          'window.location="/x"',
-          "websocket.send(cmd)",
-          "promise.all([x,y])",
-          "array.from(data)",
-        ],
-      };
-
-      let gameState = {
-        currentMission: 1,
-        phase: "memorize",
-        keysToRemember: [],
-        userInput: [],
-        // Faza 2 - zapamiętywanie
-        memoryRoundsNeeded: 1,
-        currentMemoryRound: 0,
-        // Faza 3 - wpisywanie komend
-        codeRoundsNeeded: 1,
-        currentCodeRound: 0,
-        currentCode: "",
-        wordsToFind: [],
-        // Faza 4 - hasło/hasła
-        finalCode: "",
-        finalCodes: [], // wiele haseł do znalezienia
-        currentFinalRound: 0,
-        finalRoundsNeeded: 1,
-        finalAttempts: 0, // próby w fazie 4
-        finalJSCode: "",
-        // Tryb policji (po nieudanej fazie 4)
-        policeMode: false,
-        policeTimeLimit: 210, // 3.5 minuty
-        homePassword: "",
-        // Stan przed policją (do przywrócenia po ucieczce)
-        savedState: null,
-        // Blokada spamu przycisków
-        isProcessing: false,
-        // Ogólne
-        attempts: 0,
-        startTime: null,
-        timerInterval: null,
-        timeLimit: 0,
-        stats: {
-          completed: 0,
-          totalAttempts: 0,
-          totalTime: 0,
-          rewards: 0,
-        },
-      };
-
-      function loadGame() {
-        const saved = localStorage.getItem("hackerSimulator");
-        if (saved) {
-          const data = JSON.parse(saved);
-          gameState.currentMission = data.currentMission || 1;
-          gameState.stats = data.stats || gameState.stats;
-          updateUI();
-        }
-      }
-
-      function saveGame() {
-        localStorage.setItem(
-          "hackerSimulator",
-          JSON.stringify({
-            currentMission: gameState.currentMission,
-            stats: gameState.stats,
-          })
-        );
-      }
-
-      function generateMission(missionNumber) {
-        // Wybierz losowy typ celu
-        const targetKey =
-          targetTypesList[Math.floor(Math.random() * targetTypesList.length)];
-        const target = targetTypes[targetKey];
-
-        // Trudność = bazowa trudność celu + bonus za numer misji
-        const missionBonus = Math.floor(missionNumber / 100); // +1 co 100 misji
-        const difficulty = Math.min(10, target.baseDifficulty + missionBonus);
-
-        // Im trudniejsze, tym dłuższe hasło w fazie 1/2 (od 3 do 6 znaków)
-        const keysCount = Math.min(3 + Math.floor(difficulty / 2), 6);
-
-        // Im trudniejsze, tym więcej rund fazy 2 (do 3)
-        const memoryRounds = Math.min(1 + Math.floor(difficulty / 4), 3);
-
-        // Im trudniejsze, tym więcej rund fazy 3 (do 5)
-        const codeRounds = Math.min(1 + Math.floor(difficulty / 2), 5);
-
-        // Im trudniejsze, tym więcej haseł w fazie 4 (do 5)
-        const finalRounds = Math.min(1 + Math.floor(difficulty / 2), 5);
-
-        // Im trudniejsze, tym dłuższe hasła w fazie 4 (4-8 cyfr)
-        const passwordLength = Math.min(4 + Math.floor(difficulty / 3), 8);
-
-        const hasTimeLimit = missionNumber > TUTORIAL_MISSIONS;
-        // Trudniejsze = więcej czasu: łatwe 180s (3 min), trudne 240s (4 min)
-        const timeLimit = hasTimeLimit ? 180 + difficulty * 6 : 0;
-
-        return {
-          number: missionNumber,
-          type: target.name,
-          difficulty: difficulty,
-          keysCount: keysCount,
-          memoryRounds: memoryRounds,
-          codeRounds: codeRounds,
-          finalRounds: finalRounds,
-          passwordLength: passwordLength,
-          timeLimit: timeLimit,
+        const TOTAL_MISSIONS = 100;
+        const TUTORIAL_MISSIONS = 2;
+        
+        // Cele pogrupowane według poziomu trudności
+        const targetsByDifficulty = {
+            1: ['LAPTOP', 'TELEFON', 'TABLET', 'SMARTWATCH', 'DRUKARKA', 'ROUTER DOMOWY', 'KAMERA IP', 'SMART TV', 'KONSOLA', 'GŁOŚNIK BT'],
+            2: ['KOMPUTER', 'NOTEBOOK', 'MONITOR SIECI', 'NAS', 'SWITCH', 'ACCESS POINT', 'SMART HOME', 'TERMOSTAT', 'LODÓWKA SMART', 'ODKURZACZ ROBOT'],
+            3: ['STACJA ROBOCZA', 'SERWER PLIKÓW', 'ROUTER FIRMOWY', 'KAMERA CCTV', 'ALARM', 'DOMOFON', 'BRAMKA IOT', 'CZYTNIK KART', 'TERMINAL POS', 'BANKOMAT'],
+            4: ['SERWER WWW', 'SERWER MAIL', 'BAZA MYSQL', 'FIREWALL', 'VPN', 'PROXY', 'LOAD BALANCER', 'DNS SERVER', 'KONTROLER DOMENY', 'BACKUP SERVER'],
+            5: ['SERWER KORPORACYJNY', 'CENTRUM DANYCH', 'CHMURA PRYWATNA', 'KLASTER', 'MAINFRAME', 'SCADA', 'SYSTEM ERP', 'CRM', 'GIEŁDA', 'BANK LOKALNY'],
+            6: ['SIEĆ RZĄDOWA', 'SYSTEM GŁOSOWANIA', 'SZPITAL', 'ELEKTROWNIA', 'OCZYSZCZALNIA', 'LOTNISKO', 'KOLEJ', 'METRO', 'URZĄD MIASTA', 'SĄDY'],
+            7: ['MINISTERSTWO', 'AMBASADA', 'BAZA WOJSKOWA', 'SATELITA', 'CENTRUM DOWODZENIA', 'AGENCJA WYWIADOWCZA', 'INTERPOL', 'EUROPOL', 'NATO', 'ONZ'],
+            8: ['BANK CENTRALNY', 'GIEŁDA NARODOWA', 'SYSTEM SWIFT', 'REZERWA FEDERALNA', 'KRYPTOGIEŁDA', 'BLOCKCHAIN', 'HEDGE FUND', 'WALL STREET', 'CITY LONDON', 'IMF'],
+            9: ['CIA', 'FBI', 'NSA', 'MI6', 'MOSSAD', 'FSB', 'BND', 'DGSE', 'GCHQ', 'PENTAGON BACKUP'],
+            10: ['PENTAGON', 'BIAŁY DOM', 'KREML', 'AREA 51', 'NORAD', 'CERN', 'NASA', 'SPACE X', 'GOOGLE HQ', 'SKYNET']
         };
-      }
+        
+        const codeTemplates = {
+            bash: [
+                'chmod 777 /door',
+                'ssh admin@target',
+                'cat /etc/shadow',
+                'rm -rf /var/log',
+                'service firewall stop',
+                'systemctl disable sec',
+                'iptables -f',
+                'kill -9 1234',
+                'mount /dev/sdb1',
+                'grep root /etc'
+            ],
+            python: [
+                'import socket',
+                's.connect(("target"))',
+                'os.system("rm -rf")',
+                'requests.post(url)',
+                'subprocess.call(cmd)',
+                'json.loads(data)',
+                'exec(open("x.py"))',
+                'hashlib.md5(pass)',
+                'pickle.loads(data)',
+                'sys.exit(0)'
+            ],
+            javascript: [
+                'fetch("/api/unlock")',
+                'document.cookie="x"',
+                'localstorage.setitem(k)',
+                'eval(atob(payload))',
+                'settimeout(hack)',
+                'console.log(btoa(d))',
+                'window.location="/x"',
+                'websocket.send(cmd)',
+                'promise.all([x,y])',
+                'array.from(data)'
+            ]
+        };
 
-      function generateKeys(count) {
-        const allKeys = "QWERTYUIOPASDFGHJKLZXCVBNM1234567890".split("");
-        const keys = [];
-        for (let i = 0; i < count; i++) {
-          keys.push(allKeys[Math.floor(Math.random() * allKeys.length)]);
+        let gameState = {
+            currentMission: 1,
+            phase: 'memorize',
+            keysToRemember: [],
+            userInput: [],
+            // Faza 2 - zapamiętywanie
+            memoryRoundsNeeded: 1,
+            currentMemoryRound: 0,
+            // Faza 3 - wpisywanie komend
+            codeRoundsNeeded: 1,
+            currentCodeRound: 0,
+            currentCode: '',
+            wordsToFind: [],
+            // Faza 4 - hasło/hasła
+            finalCode: '',
+            finalCodes: [], // wiele haseł do znalezienia
+            currentFinalRound: 0,
+            finalRoundsNeeded: 1,
+            finalAttempts: 0, // próby w fazie 4
+            finalJSCode: '',
+            // Tryb policji (po nieudanej fazie 4)
+            policeMode: false,
+            policeTimeLimit: 210, // 3.5 minuty
+            homePassword: '',
+            // Stan przed policją (do przywrócenia po ucieczce)
+            savedState: null,
+            // Blokada spamu przycisków
+            isProcessing: false,
+            // Ogólne
+            attempts: 0,
+            startTime: null,
+            timerInterval: null,
+            timeLimit: 0,
+            stats: {
+                completed: 0,
+                totalAttempts: 0,
+                totalTime: 0,
+                rewards: 0
+            }
+        };
+
+        function loadGame() {
+            const saved = localStorage.getItem('hackerSimulator');
+            if (saved) {
+                const data = JSON.parse(saved);
+                gameState.currentMission = data.currentMission || 1;
+                gameState.stats = data.stats || gameState.stats;
+                updateUI();
+            }
         }
-        return keys;
-      }
 
-      function generateCode() {
-        return "return grant(access)";
-      }
-
-      function generatePassword(length) {
-        // Generuj hasło o podanej długości (4-8 cyfr)
-        const min = Math.pow(10, length - 1);
-        const max = Math.pow(10, length) - 1;
-        return Math.floor(min + Math.random() * (max - min + 1)).toString();
-      }
-
-      function generateFullCode() {
-        const mission = generateMission(gameState.currentMission);
-        const difficulty = mission.difficulty;
-        const passLength = mission.passwordLength || 4;
-
-        // Generuj wiele haseł (do 5) zależnie od trudności, każde o długości passwordLength
-        const passwords = [];
-        for (let i = 0; i < mission.finalRounds; i++) {
-          passwords.push(generatePassword(passLength));
+        function saveGame() {
+            localStorage.setItem('hackerSimulator', JSON.stringify({
+                currentMission: gameState.currentMission,
+                stats: gameState.stats
+            }));
         }
 
-        // Komendy JS - im trudniejsze tym dłuższe (pełne linie kodu!)
-        const easyCommands = [
-          'chmod("/etc/shadow")',
-          "return grant(access)",
-          "socket.connect(host)",
-          "kill(process.pid)",
-          "login(credentials)",
-        ];
+        function generateMission(missionNumber) {
+            // TRUDNOŚĆ ZALEŻY OD NUMERU MISJI
+            // Misje 1-2 (tutorial): poziom 1
+            // Misje 3-12: poziom 2
+            // Misje 13-22: poziom 3
+            // ... itd do poziomu 10
+            let difficulty;
+            if (missionNumber <= TUTORIAL_MISSIONS) {
+                difficulty = 1; // Tutorial = zawsze 1
+            } else {
+                // Po tutorialu: co 10 misji +1 poziom
+                difficulty = Math.min(10, 2 + Math.floor((missionNumber - TUTORIAL_MISSIONS - 1) / 10));
+            }
+            
+            // Wybierz losowy cel z odpowiedniego poziomu trudności
+            const targets = targetsByDifficulty[difficulty];
+            const targetName = targets[Math.floor(Math.random() * targets.length)];
+            
+            // Im trudniejsze, tym dłuższe hasło w fazie 1/2 (od 3 do 6 znaków)
+            const keysCount = Math.min(3 + Math.floor(difficulty / 2), 6);
+            
+            // Im trudniejsze, tym więcej rund fazy 2 (do 3)
+            const memoryRounds = Math.min(1 + Math.floor(difficulty / 4), 3);
+            
+            // Im trudniejsze, tym więcej rund fazy 3 (do 5)
+            const codeRounds = Math.min(1 + Math.floor(difficulty / 2), 5);
+            
+            // Im trudniejsze, tym więcej haseł w fazie 4 (do 5)
+            const finalRounds = Math.min(1 + Math.floor(difficulty / 2), 5);
+            
+            // Im trudniejsze, tym dłuższe hasła w fazie 4 (4-8 cyfr)
+            const passwordLength = Math.min(4 + Math.floor(difficulty / 3), 8);
+            
+            const hasTimeLimit = missionNumber > TUTORIAL_MISSIONS;
+            // Trudniejsze = więcej czasu: łatwe 180s (3 min), trudne 240s (4 min)
+            const timeLimit = hasTimeLimit ? 180 + difficulty * 6 : 0;
 
-        const mediumCommands = [
-          'chmod("/etc/shadow", 777)',
-          "socket.connect(config.host)",
-          'fetch("/api/auth").then()',
-          'sudo("rm -rf /var/log")',
-          "exec(command, arguments)",
-        ];
-
-        const hardCommands = [
-          "if (login(creds)) { grant() }",
-          "socket.connect(config.host, port)",
-          'fetch("/api/auth").then(resolve)',
-          "kill(process.pid, SIGTERM)",
-          'chmod("/etc/shadow", 0777)',
-        ];
-
-        const veryHardCommands = [
-          "if (login(credentials)) { return grant(access) }",
-          "socket.connect(config.host, config.port)",
-          'fetch("/api/auth", options).then(callback)',
-          'sudo("rm -rf /var/log/*", force: true)',
-          "exec(command, args, { shell: true })",
-        ];
-
-        // Wybierz komendy zależnie od trudności
-        let commands;
-        if (difficulty <= 2) commands = easyCommands;
-        else if (difficulty <= 5) commands = mediumCommands;
-        else if (difficulty <= 8) commands = hardCommands;
-        else commands = veryHardCommands;
-
-        // Wylosuj komendy do wpisania
-        const wordsToFind = [];
-        const shuffled = [...commands].sort(() => Math.random() - 0.5);
-        for (let i = 0; i < mission.codeRounds; i++) {
-          wordsToFind.push(shuffled[i % shuffled.length]);
+            return {
+                number: missionNumber,
+                type: targetName,
+                difficulty: difficulty,
+                keysCount: keysCount,
+                memoryRounds: memoryRounds,
+                codeRounds: codeRounds,
+                finalRounds: finalRounds,
+                passwordLength: passwordLength,
+                timeLimit: timeLimit
+            };
         }
 
-        // Generuj kod z wieloma hasłami
-        const jsCode = `function authenticate() {
+        function generateKeys(count) {
+            const allKeys = 'QWERTYUIOPASDFGHJKLZXCVBNM1234567890'.split('');
+            const keys = [];
+            for (let i = 0; i < count; i++) {
+                keys.push(allKeys[Math.floor(Math.random() * allKeys.length)]);
+            }
+            return keys;
+        }
+
+        function generateCode() {
+            return 'return grant(access)';
+        }
+        
+        function generatePassword(length) {
+            // Generuj hasło o podanej długości (4-8 cyfr)
+            const min = Math.pow(10, length - 1);
+            const max = Math.pow(10, length) - 1;
+            return Math.floor(min + Math.random() * (max - min + 1)).toString();
+        }
+        
+        function generateFullCode() {
+            const mission = generateMission(gameState.currentMission);
+            const difficulty = mission.difficulty;
+            const passLength = mission.passwordLength || 4;
+            
+            // Generuj wiele haseł (do 5) zależnie od trudności, każde o długości passwordLength
+            const passwords = [];
+            for (let i = 0; i < mission.finalRounds; i++) {
+                passwords.push(generatePassword(passLength));
+            }
+            
+            // Komendy JS - im trudniejsze tym dłuższe (pełne linie kodu!)
+            const easyCommands = [
+                'chmod("/etc/shadow")',
+                'return grant(access)',
+                'socket.connect(host)',
+                'kill(process.pid)',
+                'login(credentials)'
+            ];
+            
+            const mediumCommands = [
+                'chmod("/etc/shadow", 777)',
+                'socket.connect(config.host)',
+                'fetch("/api/auth").then()',
+                'sudo("rm -rf /var/log")',
+                'exec(command, arguments)'
+            ];
+            
+            const hardCommands = [
+                'if (login(creds)) { grant() }',
+                'socket.connect(config.host, port)',
+                'fetch("/api/auth").then(resolve)',
+                'kill(process.pid, SIGTERM)',
+                'chmod("/etc/shadow", 0777)'
+            ];
+            
+            const veryHardCommands = [
+                'if (login(credentials)) { return grant(access) }',
+                'socket.connect(config.host, config.port)',
+                'fetch("/api/auth", options).then(callback)',
+                'sudo("rm -rf /var/log/*", force: true)',
+                'exec(command, args, { shell: true })'
+            ];
+            
+            // Wybierz komendy zależnie od trudności
+            let commands;
+            if (difficulty <= 2) commands = easyCommands;
+            else if (difficulty <= 5) commands = mediumCommands;
+            else if (difficulty <= 8) commands = hardCommands;
+            else commands = veryHardCommands;
+            
+            // Wylosuj komendy do wpisania
+            const wordsToFind = [];
+            const shuffled = [...commands].sort(() => Math.random() - 0.5);
+            for (let i = 0; i < mission.codeRounds; i++) {
+                wordsToFind.push(shuffled[i % shuffled.length]);
+            }
+            
+            // Generuj kod z wieloma hasłami
+            const jsCode = `function authenticate() {
     const config = {
         host: "target.sys",
         port: 8443,
-        key1: ${passwords[0]}${
-          passwords[1]
-            ? `,
-        key2: ${passwords[1]}`
-            : ""
-        }${
-          passwords[2]
-            ? `,
-        key3: ${passwords[2]}`
-            : ""
-        }${
-          passwords[3]
-            ? `,
-        key4: ${passwords[3]}`
-            : ""
-        }${
-          passwords[4]
-            ? `,
-        key5: ${passwords[4]}`
-            : ""
-        }
+        key1: ${passwords[0]}${passwords[1] ? `,
+        key2: ${passwords[1]}` : ''}${passwords[2] ? `,
+        key3: ${passwords[2]}` : ''}${passwords[3] ? `,
+        key4: ${passwords[3]}` : ''}${passwords[4] ? `,
+        key5: ${passwords[4]}` : ''}
     };
     
     const credentials = {
@@ -1004,1191 +936,1283 @@
     fetch("/api/auth", options).then(callback);
 }`;
 
-        return {
-          code: jsCode,
-          passwords: passwords,
-          password: passwords[0],
-          wordsToFind: wordsToFind,
-        };
-      }
-
-      function generateFinalCode() {
-        return generateFullCode();
-      }
-
-      // Generuj hasło do zabezpieczenia domu (tryb policji)
-      function generateHomePassword() {
-        const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-        let password = "";
-        for (let i = 0; i < 8; i++) {
-          password += chars[Math.floor(Math.random() * chars.length)];
-        }
-        return password;
-      }
-
-      function addTerminalLine(text, isCommand = false) {
-        const terminal = document.getElementById("terminalOutput");
-        const line = document.createElement("div");
-        line.className = "code-line";
-
-        if (isCommand) {
-          line.innerHTML = `<span class="command-prompt">root@hacker:~$</span> ${text}`;
-        } else {
-          line.innerHTML = text;
+            return { 
+                code: jsCode, 
+                passwords: passwords,
+                password: passwords[0],
+                wordsToFind: wordsToFind
+            };
         }
 
-        terminal.appendChild(line);
-        terminal.scrollTop = terminal.scrollHeight;
-      }
-
-      function clearTerminal() {
-        document.getElementById("terminalOutput").innerHTML = "";
-      }
-
-      function startMission() {
-        const mission = generateMission(gameState.currentMission);
-
-        // Generuj pełny kod na początku misji
-        const fullCodeData = generateFullCode();
-        gameState.finalJSCode = fullCodeData.code;
-        gameState.finalCodes = fullCodeData.passwords;
-        gameState.finalCode = fullCodeData.passwords[0];
-        gameState.wordsToFind = fullCodeData.wordsToFind;
-        gameState.finalRoundsNeeded = mission.finalRounds;
-        gameState.currentFinalRound = 0;
-        gameState.finalAttempts = 0; // Reset prób w fazie 4
-
-        // Reset trybu policji
-        gameState.policeMode = false;
-
-        gameState.keysToRemember = generateKeys(mission.keysCount);
-        gameState.memoryRoundsNeeded = mission.memoryRounds;
-        gameState.currentMemoryRound = 0;
-        gameState.codeRoundsNeeded = mission.codeRounds;
-        gameState.currentCodeRound = 0;
-        gameState.userInput = [];
-        gameState.phase = "memorize";
-        gameState.timeLimit = mission.timeLimit;
-        gameState.startTime = Date.now();
-
-        clearTerminal();
-        addTerminalLine("═══════════════════════════════════════════");
-        addTerminalLine(`INICJALIZACJA SYSTEMU HAKOWANIA...`);
-        addTerminalLine(`CEL: ${mission.type} #${mission.number}`);
-        addTerminalLine(`POZIOM ZABEZPIECZEŃ: ${mission.difficulty}/10`);
-        addTerminalLine("═══════════════════════════════════════════");
-        addTerminalLine("");
-        addTerminalLine("Analizowanie luk w zabezpieczeniach...");
-        addTerminalLine("Przygotowywanie exploita...");
-        addTerminalLine("");
-        addTerminalLine("GOTOWE! Zapamiętaj sekwencję klawiszy:");
-
-        document.getElementById("targetType").textContent = mission.type;
-        document.getElementById("difficulty").textContent = `${
-          mission.difficulty
-        }/10 ${"⭐".repeat(mission.difficulty)}`;
-        document.getElementById("keysCount").textContent = mission.keysCount;
-        document.getElementById(
-          "codeRounds"
-        ).textContent = `F2:${mission.memoryRounds}x F3:${mission.codeRounds}x F4:${mission.finalRounds}x`;
-        document.getElementById("timeLimit").textContent =
-          mission.timeLimit > 0
-            ? `${mission.timeLimit}s`
-            : "Bez limitu (Tutorial)";
-
-        showMemorizePhase();
-      }
-
-      function showMemorizePhase() {
-        gameState.phase = "memorize";
-
-        // Generuj nowe klawisze dla każdej rundy
-        if (gameState.currentMemoryRound > 0) {
-          const mission = generateMission(gameState.currentMission);
-          gameState.keysToRemember = generateKeys(mission.keysCount);
+        function generateFinalCode() {
+            return generateFullCode();
+        }
+        
+        // Generuj hasło do zabezpieczenia domu (tryb policji)
+        function generateHomePassword() {
+            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+            let password = '';
+            for (let i = 0; i < 8; i++) {
+                password += chars[Math.floor(Math.random() * chars.length)];
+            }
+            return password;
         }
 
-        document.getElementById(
-          "phaseIndicator"
-        ).textContent = `🧠 FAZA 1: ZAPAMIĘTAJ KLAWISZE (${
-          gameState.currentMemoryRound + 1
-        }/${gameState.memoryRoundsNeeded})`;
-
-        const keysDisplay = document.getElementById("keysDisplay");
-        keysDisplay.innerHTML = "";
-        keysDisplay.style.display = "flex";
-
-        gameState.keysToRemember.forEach((key, index) => {
-          setTimeout(() => {
-            const keyElement = document.createElement("div");
-            keyElement.className = "key";
-            keyElement.textContent = key;
-            keysDisplay.appendChild(keyElement);
-          }, index * 200);
-        });
-
-        document.getElementById("inputArea").style.display = "none";
-        document.getElementById("readyButton").style.display = "none";
-
-        setTimeout(() => {
-          document.getElementById("readyButton").style.display = "block";
-        }, gameState.keysToRemember.length * 200 + 1000);
-      }
-
-      document.getElementById("btnReady").onclick = () => {
-        document.getElementById("readyButton").style.display = "none";
-        if (gameState.policeMode) {
-          showPoliceInputPhase();
-        } else {
-          showInputPhase();
-        }
-      };
-
-      function showInputPhase() {
-        gameState.phase = "input";
-        gameState.userInput = [];
-        document.getElementById(
-          "phaseIndicator"
-        ).textContent = `⌨️ FAZA 2: WPISZ KLAWISZE Z PAMIĘCI (${
-          gameState.currentMemoryRound + 1
-        }/${gameState.memoryRoundsNeeded})`;
-        document.getElementById("keysDisplay").style.display = "none";
-        document.getElementById("inputArea").style.display = "block";
-        document.getElementById("inputDisplay").textContent = "";
-
-        // Pokaż przycisk "Nie pamiętam"
-        document.getElementById("forgotBtnContainer").style.display = "block";
-
-        createKeyboard();
-        startTimer();
-      }
-
-      function createKeyboard() {
-        const keyboard = document.getElementById("keyboard");
-        keyboard.innerHTML = "";
-        keyboard.style.display = "grid";
-
-        const keys = "QWERTYUIOP|ASDFGHJKL|ZXCVBNM|1234567890".split("|");
-
-        keys.forEach((row) => {
-          row.split("").forEach((key) => {
-            const button = document.createElement("button");
-            button.className = "key-button";
-            button.textContent = key;
-            button.onclick = () => addKey(key);
-            keyboard.appendChild(button);
-          });
-        });
-      }
-
-      function addKey(key) {
-        const validPhases = [
-          "input",
-          "code",
-          "final",
-          "police_input",
-          "police_code",
-          "police_final",
-        ];
-        if (!validPhases.includes(gameState.phase)) return;
-
-        gameState.userInput.push(key);
-        updateInputDisplay();
-      }
-
-      function updateInputDisplay() {
-        const display = document.getElementById("inputDisplay");
-        if (gameState.phase === "input" || gameState.phase === "police_input") {
-          display.textContent = gameState.userInput.join(" ");
-        } else {
-          display.textContent = gameState.userInput.join("");
-        }
-      }
-
-      document.getElementById("backspaceBtn").onclick = () => {
-        gameState.userInput.pop();
-        updateInputDisplay();
-      };
-
-      document.getElementById("clearBtn").onclick = () => {
-        gameState.userInput = [];
-        updateInputDisplay();
-      };
-
-      document.getElementById("submitBtn").onclick = () => {
-        // Blokada spamu - nie można klikać wielokrotnie
-        if (gameState.isProcessing) return;
-        gameState.isProcessing = true;
-
-        if (gameState.phase === "input") {
-          checkKeysInput();
-        } else if (gameState.phase === "code") {
-          checkCodeInput();
-        } else if (gameState.phase === "final") {
-          checkFinalInput();
-        } else if (gameState.phase.startsWith("police_")) {
-          checkPoliceInput();
-        }
-
-        // Odblokuj po 500ms
-        setTimeout(() => {
-          gameState.isProcessing = false;
-        }, 500);
-      };
-
-      // Przycisk "Nie pamiętam" - automatycznie włącza policję
-      document.getElementById("forgotBtn").onclick = () => {
-        // Blokada spamu
-        if (gameState.isProcessing) return;
-        gameState.isProcessing = true;
-
-        document.getElementById("forgotBtnContainer").style.display = "none";
-
-        if (gameState.policeMode) {
-          // W trybie policji - od razu łapią
-          showMessage("🚔 NIE PAMIĘTASZ? POLICJA CIĘ ŁAPIE!", "error");
-          addTerminalLine("");
-          addTerminalLine(
-            '<span style="color: #ff0000;">Nie pamiętasz kodu? ZŁAPANY!</span>'
-          );
-          setTimeout(() => {
-            policeCaught();
-            gameState.isProcessing = false;
-          }, 2000);
-        } else {
-          // Normalny tryb - włącz policję
-          showMessage("🚨 NIE PAMIĘTASZ? POLICJA JEDZIE!", "error");
-          addTerminalLine("");
-          addTerminalLine(
-            '<span style="color: #ff0000;">🚨 Nie pamiętasz hasła? ALARM!</span>'
-          );
-          gameState.attempts++;
-          updateUI();
-          setTimeout(() => {
-            startPoliceMode();
-            gameState.isProcessing = false;
-          }, 2000);
-        }
-      };
-
-      function checkKeysInput() {
-        const correct =
-          gameState.userInput.join("") === gameState.keysToRemember.join("");
-
-        if (correct) {
-          gameState.currentMemoryRound++;
-
-          if (gameState.currentMemoryRound < gameState.memoryRoundsNeeded) {
-            // Kolejna runda fazy 2
-            showMessage("✓ SEKWENCJA POPRAWNA!", "success");
-            addTerminalLine("");
-            addTerminalLine("✓ Sekwencja klawiszy zaakceptowana!", true);
-            addTerminalLine(
-              `Przygotowuję kolejną sekwencję... (${
-                gameState.currentMemoryRound + 1
-              }/${gameState.memoryRoundsNeeded})`
-            );
-
-            setTimeout(() => {
-              showMemorizePhase();
-            }, 1500);
-          } else {
-            // Wszystkie rundy fazy 2 ukończone - przechodź do fazy 3
-            showMessage("✓ WSZYSTKIE SEKWENCJE POPRAWNE!", "success");
-            addTerminalLine("");
-            addTerminalLine("✓ Wszystkie sekwencje zaakceptowane!", true);
-            addTerminalLine("Ładowanie kodu do analizy...");
-
-            setTimeout(() => {
-              showCodePhase();
-            }, 1500);
-          }
-        } else {
-          // BŁĄD = POLICJA!
-          showMessage("✗ BŁĘDNA SEKWENCJA!", "error");
-          addTerminalLine("");
-          addTerminalLine(
-            '<span style="color: #ff0000;">🚨 WYKRYTO WŁAMANIE! POLICJA JEDZIE!</span>'
-          );
-          gameState.attempts++;
-          updateUI();
-
-          setTimeout(() => {
-            startPoliceMode();
-          }, 2000);
-        }
-      }
-
-      function showCodePhase() {
-        gameState.phase = "code";
-        gameState.userInput = [];
-
-        // Pobierz komendę do wpisania z listy
-        gameState.currentCode =
-          gameState.wordsToFind[gameState.currentCodeRound];
-
-        document.getElementById(
-          "phaseIndicator"
-        ).textContent = `💻 FAZA 3: PRZEPISZ KOMENDĘ (${
-          gameState.currentCodeRound + 1
-        }/${gameState.codeRoundsNeeded})`;
-
-        clearTerminal();
-
-        // Wyświetl kod JS
-        const lines = gameState.finalJSCode.split("\n");
-        lines.forEach((line) => {
-          addTerminalLine(line);
-        });
-
-        addTerminalLine("");
-        addTerminalLine(
-          '<span class="command-prompt">root@hacker:~$</span> <span id="codeTarget" style="color: #ffff00;">' +
-            gameState.currentCode +
-            "</span>"
-        );
-
-        // Pokaż input area i klawiaturę
-        document.getElementById("inputArea").style.display = "block";
-        document.getElementById("inputDisplay").textContent = "";
-
-        // Ukryj przycisk "Nie pamiętam" w fazie 3
-        document.getElementById("forgotBtnContainer").style.display = "none";
-
-        createCodeKeyboard();
-      }
-
-      function createCodeKeyboard() {
-        const keyboard = document.getElementById("keyboard");
-        keyboard.innerHTML = "";
-        keyboard.style.display = "grid";
-        keyboard.style.gridTemplateColumns =
-          "repeat(auto-fit, minmax(45px, 1fr))";
-
-        const specialKeys = [
-          ["q", "w", "e", "r", "t", "y", "u", "i", "o", "p"],
-          ["a", "s", "d", "f", "g", "h", "j", "k", "l"],
-          ["z", "x", "c", "v", "b", "n", "m"],
-          ["1", "2", "3", "4", "5", "6", "7", "8", "9", "0"],
-          [" ", ".", ",", "/", "\\", "-", "_", "=", "+", "*"],
-          ["(", ")", "[", "]", "{", "}", "<", ">", "|", "&"],
-          [":", ";", '"', "'", "!", "?", "@", "#", "$", "%"],
-        ];
-
-        specialKeys.forEach((row) => {
-          row.forEach((key) => {
-            const button = document.createElement("button");
-            button.className = "key-button";
-            button.textContent = key === " " ? "SPACJA" : key;
-            button.style.fontSize = "clamp(12px, 1.8vw, 16px)";
-            button.style.padding = "clamp(8px, 2vw, 12px)";
-            button.onclick = () => addKey(key);
-            keyboard.appendChild(button);
-          });
-        });
-      }
-
-      function checkCodeInput() {
-        const userCode = gameState.userInput.join("");
-        const correctCode = gameState.currentCode;
-
-        if (userCode === correctCode) {
-          addTerminalLine("");
-          addTerminalLine("✓ Kod wykonany pomyślnie!");
-
-          gameState.currentCodeRound++;
-
-          if (gameState.currentCodeRound < gameState.codeRoundsNeeded) {
-            showMessage("✓ KOD POPRAWNY!", "success");
-            setTimeout(() => {
-              showCodePhase();
-            }, 1500);
-          } else {
-            showMessage("✓ WSZYSTKIE KODY WYKONANE!", "success");
-            setTimeout(() => {
-              showFinalPhase();
-            }, 1500);
-          }
-        } else {
-          // BŁĄD = POLICJA!
-          showMessage("❌ BŁĄD W KODZIE!", "error");
-          addTerminalLine("");
-          addTerminalLine(
-            '<span style="color: #ff0000;">🚨 WYKRYTO WŁAMANIE! POLICJA JEDZIE!</span>'
-          );
-          gameState.attempts++;
-          updateUI();
-
-          setTimeout(() => {
-            startPoliceMode();
-          }, 2000);
-        }
-      }
-
-      function showFinalPhase() {
-        gameState.phase = "final";
-        gameState.userInput = [];
-
-        // Ustaw aktualne hasło do znalezienia
-        gameState.finalCode = gameState.finalCodes[gameState.currentFinalRound];
-
-        document.getElementById(
-          "phaseIndicator"
-        ).textContent = `🔍 FAZA 4: ZNAJDŹ HASŁO (${
-          gameState.currentFinalRound + 1
-        }/${gameState.finalRoundsNeeded})`;
-
-        clearTerminal();
-        addTerminalLine("═══════════════════════════════════════════");
-        addTerminalLine(
-          `🎯 ZNAJDŹ HASŁO ${gameState.currentFinalRound + 1}/${
-            gameState.finalRoundsNeeded
-          }`
-        );
-        addTerminalLine("═══════════════════════════════════════════");
-        addTerminalLine("");
-        addTerminalLine(
-          `Znajdź key${gameState.currentFinalRound + 1} w kodzie (4 cyfry):`
-        );
-        addTerminalLine("");
-
-        // Wyświetl kod BEZ podświetlania hasła
-        const lines = gameState.finalJSCode.split("\n");
-        lines.forEach((line) => {
-          addTerminalLine(line);
-        });
-
-        addTerminalLine("");
-
-        // Pokaż input area i klawiaturę
-        document.getElementById("inputArea").style.display = "block";
-        document.getElementById("inputDisplay").textContent = "";
-
-        createNumberKeyboard();
-      }
-
-      function createNumberKeyboard() {
-        const keyboard = document.getElementById("keyboard");
-        keyboard.innerHTML = "";
-        keyboard.style.display = "grid";
-        keyboard.style.gridTemplateColumns = "repeat(5, 1fr)";
-
-        const numbers = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "0"];
-
-        numbers.forEach((num) => {
-          const button = document.createElement("button");
-          button.className = "key-button";
-          button.textContent = num;
-          button.style.padding = "20px";
-          button.style.fontSize = "20px";
-          button.onclick = () => addKey(num);
-          keyboard.appendChild(button);
-        });
-      }
-
-      function checkFinalInput() {
-        const userCode = gameState.userInput.join("");
-
-        if (userCode === gameState.finalCode) {
-          gameState.currentFinalRound++;
-
-          if (gameState.currentFinalRound < gameState.finalRoundsNeeded) {
-            // Kolejne hasło do znalezienia
-            showMessage("✓ HASŁO POPRAWNE!", "success");
-            setTimeout(() => {
-              showFinalPhase();
-            }, 1500);
-          } else {
-            // Wszystkie hasła znalezione!
-            missionComplete();
-          }
-        } else {
-          // BŁĄD = POLICJA!
-          showMessage("❌ BŁĘDNE HASŁO!", "error");
-          addTerminalLine("");
-          addTerminalLine(
-            '<span style="color: #ff0000;">🚨 WYKRYTO WŁAMANIE! POLICJA JEDZIE!</span>'
-          );
-          gameState.attempts++;
-          updateUI();
-
-          setTimeout(() => {
-            startPoliceMode();
-          }, 2000);
-        }
-      }
-
-      // ============ TRYB POLICJI ============
-
-      // Dźwięk syreny policyjnej (Web Audio API)
-      let policeAudioContext = null;
-      let policeSiren = null;
-
-      function startPoliceSiren() {
-        try {
-          policeAudioContext = new (window.AudioContext ||
-            window.webkitAudioContext)();
-          policeSiren = policeAudioContext.createOscillator();
-          const gainNode = policeAudioContext.createGain();
-
-          policeSiren.connect(gainNode);
-          gainNode.connect(policeAudioContext.destination);
-
-          policeSiren.type = "sawtooth";
-          gainNode.gain.value = 0.1;
-
-          // Modulacja syreny
-          policeSiren.frequency.setValueAtTime(
-            600,
-            policeAudioContext.currentTime
-          );
-
-          const modulateSiren = () => {
-            if (!policeSiren) return;
-            const now = policeAudioContext.currentTime;
-            policeSiren.frequency.setValueAtTime(600, now);
-            policeSiren.frequency.linearRampToValueAtTime(800, now + 0.5);
-            policeSiren.frequency.linearRampToValueAtTime(600, now + 1);
-            setTimeout(modulateSiren, 1000);
-          };
-
-          policeSiren.start();
-          modulateSiren();
-        } catch (e) {
-          console.log("Audio not supported");
-        }
-      }
-
-      function stopPoliceSiren() {
-        try {
-          if (policeSiren) {
-            policeSiren.stop();
-            policeSiren = null;
-          }
-          if (policeAudioContext) {
-            policeAudioContext.close();
-            policeAudioContext = null;
-          }
-        } catch (e) {}
-      }
-
-      function startPoliceLights() {
-        // Usuń stary overlay jeśli istnieje
-        const oldOverlay = document.getElementById("policeOverlay");
-        if (oldOverlay) oldOverlay.remove();
-
-        const overlay = document.createElement("div");
-        overlay.id = "policeOverlay";
-        overlay.className = "police-overlay";
-        document.body.appendChild(overlay);
-      }
-
-      function stopPoliceLights() {
-        const overlay = document.getElementById("policeOverlay");
-        if (overlay) overlay.remove();
-      }
-
-      function startPoliceMode() {
-        // ZAPISZ STAN PRZED POLICJĄ (do przywrócenia po ucieczce)
-        gameState.savedState = {
-          phase: gameState.phase,
-          keysToRemember: [...gameState.keysToRemember],
-          currentMemoryRound: gameState.currentMemoryRound,
-          memoryRoundsNeeded: gameState.memoryRoundsNeeded,
-          currentCodeRound: gameState.currentCodeRound,
-          codeRoundsNeeded: gameState.codeRoundsNeeded,
-          wordsToFind: [...gameState.wordsToFind],
-          currentCode: gameState.currentCode,
-          currentFinalRound: gameState.currentFinalRound,
-          finalRoundsNeeded: gameState.finalRoundsNeeded,
-          finalCode: gameState.finalCode,
-          finalCodes: [...gameState.finalCodes],
-          finalJSCode: gameState.finalJSCode,
-          timeLimit: gameState.timeLimit,
-        };
-
-        gameState.policeMode = true;
-        gameState.phase = "police_memorize";
-        gameState.homePassword = generateHomePassword();
-        gameState.currentMemoryRound = 0;
-        gameState.currentCodeRound = 0;
-
-        // Automatycznie 6 znaków w trybie policji
-        gameState.keysToRemember = generateKeys(6);
-        gameState.memoryRoundsNeeded = 1;
-
-        // Więcej komend do wpisania w trybie policji (zabezpieczanie domu)
-        const policeCommands = [
-          "lock(door)",
-          "secure(home)",
-          "close(window)",
-          "arm(alarm)",
-          "hide(evidence)",
-        ];
-
-        // Losowa liczba komend (3-5)
-        const numCommands = 3 + Math.floor(Math.random() * 3);
-        gameState.codeRoundsNeeded = numCommands;
-        gameState.wordsToFind = policeCommands.slice(0, numCommands);
-
-        stopTimer();
-
-        // START EFEKTÓW POLICJI!
-        startPoliceLights();
-        startPoliceSiren();
-
-        clearTerminal();
-        addTerminalLine(
-          '<span style="color: #ff0000;">🚨🚨🚨 ALARM! POLICJA W DRODZE! 🚨🚨🚨</span>'
-        );
-        addTerminalLine("");
-        addTerminalLine(
-          '<span style="color: #ff0000;">MUSISZ ZABEZPIECZYĆ DOM!</span>'
-        );
-        addTerminalLine(`Masz 3.5 MINUTY na zamknięcie ${numCommands} rzeczy!`);
-        addTerminalLine("");
-        addTerminalLine("Zapamiętaj sekwencję klawiszy:");
-
-        document.getElementById("phaseIndicator").textContent =
-          "🚨 POLICJA! ZAMKNIJ DRZWI!";
-
-        // Start 3.5-minutowy timer
-        startPoliceTimer();
-
-        showPoliceMemorizePhase();
-      }
-
-      function startPoliceTimer() {
-        // Zatrzymaj poprzedni timer jeśli działa
-        stopTimer();
-
-        let timeLeft = 210; // 3.5 minuty
-        const timerDisplay = document.getElementById("timerDisplay");
-        timerDisplay.style.display = "block";
-        timerDisplay.style.color = "#ff0000";
-        timerDisplay.style.borderColor = "#ff0000";
-        timerDisplay.textContent = `🚨 ${timeLeft}s`;
-
-        gameState.timerInterval = setInterval(() => {
-          timeLeft--;
-          timerDisplay.textContent = `🚨 ${timeLeft}s`;
-
-          if (timeLeft <= 0) {
-            stopTimer();
-            policeCaught();
-          }
-        }, 1000);
-      }
-
-      function showPoliceMemorizePhase() {
-        gameState.phase = "police_memorize";
-
-        document.getElementById(
-          "phaseIndicator"
-        ).textContent = `🚨 ZAPAMIĘTAJ KOD DRZWI (${
-          gameState.currentMemoryRound + 1
-        }/${gameState.memoryRoundsNeeded})`;
-
-        const keysDisplay = document.getElementById("keysDisplay");
-        keysDisplay.innerHTML = "";
-        keysDisplay.style.display = "flex";
-
-        gameState.keysToRemember.forEach((key, index) => {
-          setTimeout(() => {
-            const keyElement = document.createElement("div");
-            keyElement.className = "key";
-            keyElement.style.background =
-              "linear-gradient(135deg, #ff0000 0%, #cc0000 100%)";
-            keyElement.textContent = key;
-            keysDisplay.appendChild(keyElement);
-          }, index * 150);
-        });
-
-        document.getElementById("inputArea").style.display = "none";
-        document.getElementById("readyButton").style.display = "none";
-
-        setTimeout(() => {
-          document.getElementById("readyButton").style.display = "block";
-        }, gameState.keysToRemember.length * 150 + 500);
-      }
-
-      function showPoliceInputPhase() {
-        gameState.phase = "police_input";
-        gameState.userInput = [];
-
-        document.getElementById("phaseIndicator").textContent =
-          "🚨 WPISZ KOD DRZWI!";
-        document.getElementById("keysDisplay").style.display = "none";
-        document.getElementById("inputArea").style.display = "block";
-        document.getElementById("inputDisplay").textContent = "";
-
-        // Pokaż przycisk "Nie pamiętam" (w trybie policji = od razu łapią)
-        document.getElementById("forgotBtnContainer").style.display = "block";
-
-        createKeyboard();
-      }
-
-      function showPoliceCodePhase() {
-        gameState.phase = "police_code";
-        gameState.userInput = [];
-        gameState.currentCode =
-          gameState.wordsToFind[gameState.currentCodeRound];
-
-        document.getElementById(
-          "phaseIndicator"
-        ).textContent = `🚨 ZAMKNIJ DRZWI (${gameState.currentCodeRound + 1}/${
-          gameState.codeRoundsNeeded
-        })`;
-
-        clearTerminal();
-        addTerminalLine(
-          '<span style="color: #ff0000;">🚨 ZAMYKANIE DRZWI...</span>'
-        );
-        addTerminalLine("");
-        addTerminalLine(`function secureDoor() {`);
-        addTerminalLine(`    lock(door);`);
-        addTerminalLine(`    secure(home);`);
-        addTerminalLine(`    password: "${gameState.homePassword}"`);
-        addTerminalLine(`}`);
-        addTerminalLine("");
-        addTerminalLine(
-          '<span class="command-prompt">root@home:~$</span> <span style="color: #ffff00;">' +
-            gameState.currentCode +
-            "</span>"
-        );
-
-        document.getElementById("inputArea").style.display = "block";
-        document.getElementById("inputDisplay").textContent = "";
-
-        createCodeKeyboard();
-      }
-
-      function showPoliceFinalPhase() {
-        gameState.phase = "police_final";
-        gameState.userInput = [];
-
-        document.getElementById("phaseIndicator").textContent =
-          "🚨 WPISZ HASŁO ZABEZPIECZAJĄCE!";
-
-        clearTerminal();
-        addTerminalLine(
-          '<span style="color: #ff0000;">🚨 OSTATNI KROK - HASŁO DOMU!</span>'
-        );
-        addTerminalLine("");
-        addTerminalLine(`function secureDoor() {`);
-        addTerminalLine(`    lock(door);`);
-        addTerminalLine(`    secure(home);`);
-        addTerminalLine(`    password: "${gameState.homePassword}"`);
-        addTerminalLine(`}`);
-        addTerminalLine("");
-        addTerminalLine("Wpisz hasło zabezpieczające (8 znaków):");
-
-        document.getElementById("inputArea").style.display = "block";
-        document.getElementById("inputDisplay").textContent = "";
-
-        createPoliceKeyboard();
-      }
-
-      function createPoliceKeyboard() {
-        const keyboard = document.getElementById("keyboard");
-        keyboard.innerHTML = "";
-        keyboard.style.display = "grid";
-        keyboard.style.gridTemplateColumns =
-          "repeat(auto-fit, minmax(40px, 1fr))";
-
-        const keys = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789".split("");
-
-        keys.forEach((key) => {
-          const button = document.createElement("button");
-          button.className = "key-button";
-          button.textContent = key;
-          button.style.background =
-            "linear-gradient(135deg, #330000 0%, #660000 100%)";
-          button.onclick = () => addKey(key);
-          keyboard.appendChild(button);
-        });
-      }
-
-      function checkPoliceInput() {
-        if (gameState.phase === "police_input") {
-          const correct =
-            gameState.userInput.join("") === gameState.keysToRemember.join("");
-          if (correct) {
-            gameState.currentMemoryRound++;
-            showMessage("✓ KOD POPRAWNY!", "success");
-            setTimeout(() => {
-              showPoliceCodePhase();
-            }, 1000);
-          } else {
-            showMessage("✗ BŁĘDNY KOD!", "error");
-            gameState.userInput = [];
-            updateInputDisplay();
-          }
-        } else if (gameState.phase === "police_code") {
-          const userCode = gameState.userInput.join("");
-          if (userCode === gameState.currentCode) {
-            gameState.currentCodeRound++;
-            if (gameState.currentCodeRound < gameState.codeRoundsNeeded) {
-              showMessage("✓ DRZWI ZAMKNIĘTE!", "success");
-              setTimeout(() => {
-                showPoliceCodePhase();
-              }, 1000);
+        function addTerminalLine(text, isCommand = false) {
+            const terminal = document.getElementById('terminalOutput');
+            const line = document.createElement('div');
+            line.className = 'code-line';
+            
+            if (isCommand) {
+                line.innerHTML = `<span class="command-prompt">root@hacker:~$</span> ${text}`;
             } else {
-              showMessage("✓ WSZYSTKIE DRZWI ZAMKNIĘTE!", "success");
-              setTimeout(() => {
-                showPoliceFinalPhase();
-              }, 1000);
+                line.innerHTML = text;
             }
-          } else {
-            showMessage("✗ BŁĄD!", "error");
+            
+            terminal.appendChild(line);
+            terminal.scrollTop = terminal.scrollHeight;
+        }
+
+        function clearTerminal() {
+            document.getElementById('terminalOutput').innerHTML = '';
+        }
+
+        function startMission() {
+            const mission = generateMission(gameState.currentMission);
+            
+            // Generuj pełny kod na początku misji
+            const fullCodeData = generateFullCode();
+            gameState.finalJSCode = fullCodeData.code;
+            gameState.finalCodes = fullCodeData.passwords;
+            gameState.finalCode = fullCodeData.passwords[0];
+            gameState.wordsToFind = fullCodeData.wordsToFind;
+            gameState.finalRoundsNeeded = mission.finalRounds;
+            gameState.currentFinalRound = 0;
+            gameState.finalAttempts = 0; // Reset prób w fazie 4
+            
+            // Reset trybu policji
+            gameState.policeMode = false;
+            
+            gameState.keysToRemember = generateKeys(mission.keysCount);
+            gameState.memoryRoundsNeeded = mission.memoryRounds;
+            gameState.currentMemoryRound = 0;
+            gameState.codeRoundsNeeded = mission.codeRounds;
+            gameState.currentCodeRound = 0;
+            gameState.userInput = [];
+            gameState.phase = 'memorize';
+            gameState.timeLimit = mission.timeLimit;
+            gameState.startTime = Date.now();
+
+            clearTerminal();
+            addTerminalLine('═══════════════════════════════════════════');
+            addTerminalLine(`INICJALIZACJA SYSTEMU HAKOWANIA...`);
+            addTerminalLine(`CEL: ${mission.type} #${mission.number}`);
+            addTerminalLine(`POZIOM ZABEZPIECZEŃ: ${mission.difficulty}/10`);
+            addTerminalLine('═══════════════════════════════════════════');
+            addTerminalLine('');
+            addTerminalLine('Analizowanie luk w zabezpieczeniach...');
+            addTerminalLine('Przygotowywanie exploita...');
+            addTerminalLine('');
+            addTerminalLine('GOTOWE! Zapamiętaj sekwencję klawiszy:');
+
+            document.getElementById('targetType').textContent = mission.type;
+            document.getElementById('difficulty').textContent = `${mission.difficulty}/10 ${'⭐'.repeat(mission.difficulty)}`;
+            document.getElementById('keysCount').textContent = mission.keysCount;
+            document.getElementById('codeRounds').textContent = `F2:${mission.memoryRounds}x F3:${mission.codeRounds}x F4:${mission.finalRounds}x`;
+            document.getElementById('timeLimit').textContent = mission.timeLimit > 0 ? `${mission.timeLimit}s` : 'Bez limitu (Tutorial)';
+
+            showMemorizePhase();
+        }
+
+        function showMemorizePhase() {
+            gameState.phase = 'memorize';
+            
+            // Generuj nowe klawisze dla każdej rundy
+            if (gameState.currentMemoryRound > 0) {
+                const mission = generateMission(gameState.currentMission);
+                gameState.keysToRemember = generateKeys(mission.keysCount);
+            }
+            
+            document.getElementById('phaseIndicator').textContent = 
+                `🧠 FAZA 1: ZAPAMIĘTAJ KLAWISZE (${gameState.currentMemoryRound + 1}/${gameState.memoryRoundsNeeded})`;
+            
+            const keysDisplay = document.getElementById('keysDisplay');
+            keysDisplay.innerHTML = '';
+            keysDisplay.style.display = 'flex';
+            
+            gameState.keysToRemember.forEach((key, index) => {
+                setTimeout(() => {
+                    const keyElement = document.createElement('div');
+                    keyElement.className = 'key';
+                    keyElement.textContent = key;
+                    keysDisplay.appendChild(keyElement);
+                }, index * 200);
+            });
+
+            document.getElementById('inputArea').style.display = 'none';
+            document.getElementById('readyButton').style.display = 'none';
+
+            setTimeout(() => {
+                document.getElementById('readyButton').style.display = 'block';
+            }, gameState.keysToRemember.length * 200 + 1000);
+        }
+
+        document.getElementById('btnReady').onclick = () => {
+            document.getElementById('readyButton').style.display = 'none';
+            if (gameState.policeMode) {
+                showPoliceInputPhase();
+            } else {
+                showInputPhase();
+            }
+        };
+
+        function showInputPhase() {
+            gameState.phase = 'input';
+            gameState.userInput = [];
+            document.getElementById('phaseIndicator').textContent = 
+                `⌨️ FAZA 2: WPISZ KLAWISZE Z PAMIĘCI (${gameState.currentMemoryRound + 1}/${gameState.memoryRoundsNeeded})`;
+            document.getElementById('keysDisplay').style.display = 'none';
+            document.getElementById('inputArea').style.display = 'block';
+            document.getElementById('inputDisplay').textContent = '';
+            
+            // Pokaż przycisk "Nie pamiętam"
+            document.getElementById('forgotBtnContainer').style.display = 'block';
+            
+            createKeyboard();
+            startTimer();
+        }
+
+        function createKeyboard() {
+            const keyboard = document.getElementById('keyboard');
+            keyboard.innerHTML = '';
+            keyboard.style.display = 'grid';
+            
+            const keys = 'QWERTYUIOP|ASDFGHJKL|ZXCVBNM|1234567890'.split('|');
+            
+            keys.forEach(row => {
+                row.split('').forEach(key => {
+                    const button = document.createElement('button');
+                    button.className = 'key-button';
+                    button.textContent = key;
+                    button.onclick = () => addKey(key);
+                    keyboard.appendChild(button);
+                });
+            });
+        }
+
+        function addKey(key) {
+            const validPhases = ['input', 'code', 'final', 'police_input', 'police_code', 'police_final', 'phase5_commands'];
+            if (!validPhases.includes(gameState.phase)) return;
+            
+            gameState.userInput.push(key);
+            updateInputDisplay();
+        }
+
+        function updateInputDisplay() {
+            const display = document.getElementById('inputDisplay');
+            if (gameState.phase === 'input' || gameState.phase === 'police_input') {
+                display.textContent = gameState.userInput.join(' ');
+            } else {
+                display.textContent = gameState.userInput.join('');
+            }
+        }
+
+        document.getElementById('backspaceBtn').onclick = () => {
+            gameState.userInput.pop();
+            updateInputDisplay();
+        };
+
+        document.getElementById('clearBtn').onclick = () => {
             gameState.userInput = [];
             updateInputDisplay();
-          }
-        } else if (gameState.phase === "police_final") {
-          const userCode = gameState.userInput.join("");
-          if (userCode === gameState.homePassword) {
-            policeEscaped();
-          } else {
-            showMessage("✗ BŁĘDNE HASŁO!", "error");
-            gameState.userInput = [];
-            updateInputDisplay();
-          }
-        }
-      }
+        };
 
-      function policeCaught() {
-        stopTimer();
-        stopPoliceLights();
-        stopPoliceSiren();
-        gameState.policeMode = false;
-
-        // Tracisz 5 zhakowanych misji!
-        gameState.stats.completed = Math.max(0, gameState.stats.completed - 5);
-
-        showMessage("🚔 POLICJA CIĘ ZŁAPAŁA! -5 MISJI!", "error");
-
-        clearTerminal();
-        addTerminalLine(
-          '<span style="color: #ff0000;">🚔🚔🚔 ZŁAPANY! 🚔🚔🚔</span>'
-        );
-        addTerminalLine("");
-        addTerminalLine("Policja złapała Cię!");
-        addTerminalLine(
-          '<span style="color: #ff0000;">Tracisz 5 zhakowanych misji!</span>'
-        );
-        addTerminalLine("");
-        addTerminalLine(`Pozostało: ${gameState.stats.completed} misji`);
-
-        // Ukryj przycisk "nie pamiętam"
-        document.getElementById("forgotBtnContainer").style.display = "none";
-
-        saveGame();
-        updateUI();
-
-        setTimeout(() => {
-          startMission();
-        }, 4000);
-      }
-
-      function policeEscaped() {
-        stopTimer();
-        stopPoliceLights();
-        stopPoliceSiren();
-        gameState.policeMode = false;
-
-        showMessage("✓ UCIEKŁEŚ POLICJI!", "success");
-
-        clearTerminal();
-        addTerminalLine(
-          '<span style="color: #00ff00;">✓ DOM ZABEZPIECZONY!</span>'
-        );
-        addTerminalLine("");
-        addTerminalLine("Udało Ci się zamknąć wszystkie drzwi!");
-        addTerminalLine("Policja odjechała.");
-        addTerminalLine("");
-        addTerminalLine("Wracasz do hakowania...");
-
-        // Ukryj przycisk "nie pamiętam"
-        document.getElementById("forgotBtnContainer").style.display = "none";
-
-        // PRZYWRÓĆ STAN SPRZED POLICJI
-        if (gameState.savedState) {
-          setTimeout(() => {
-            // Przywróć zapisany stan
-            gameState.phase = gameState.savedState.phase;
-            gameState.keysToRemember = gameState.savedState.keysToRemember;
-            gameState.currentMemoryRound =
-              gameState.savedState.currentMemoryRound;
-            gameState.memoryRoundsNeeded =
-              gameState.savedState.memoryRoundsNeeded;
-            gameState.currentCodeRound = gameState.savedState.currentCodeRound;
-            gameState.codeRoundsNeeded = gameState.savedState.codeRoundsNeeded;
-            gameState.wordsToFind = gameState.savedState.wordsToFind;
-            gameState.currentCode = gameState.savedState.currentCode;
-            gameState.currentFinalRound =
-              gameState.savedState.currentFinalRound;
-            gameState.finalRoundsNeeded =
-              gameState.savedState.finalRoundsNeeded;
-            gameState.finalCode = gameState.savedState.finalCode;
-            gameState.finalCodes = gameState.savedState.finalCodes;
-            gameState.finalJSCode = gameState.savedState.finalJSCode;
-            gameState.timeLimit = gameState.savedState.timeLimit;
-            gameState.userInput = [];
-            gameState.savedState = null;
-
-            // Wróć do odpowiedniej fazy
-            if (gameState.phase === "memorize") {
-              showMemorizePhase();
-            } else if (gameState.phase === "input") {
-              showMemorizePhase(); // Pokaż klawisze od nowa
-            } else if (gameState.phase === "code") {
-              showCodePhase();
-            } else if (gameState.phase === "final") {
-              showFinalPhase();
+        document.getElementById('submitBtn').onclick = () => {
+            // Blokada spamu - nie można klikać wielokrotnie
+            if (gameState.isProcessing) return;
+            gameState.isProcessing = true;
+            
+            if (gameState.phase === 'input') {
+                checkKeysInput();
+            } else if (gameState.phase === 'code') {
+                checkCodeInput();
+            } else if (gameState.phase === 'final') {
+                checkFinalInput();
+            } else if (gameState.phase === 'phase5_commands') {
+                checkPhase5Input();
+            } else if (gameState.phase.startsWith('police_')) {
+                checkPoliceInput();
             }
-          }, 3000);
-        } else {
-          setTimeout(() => {
-            startMission();
-          }, 3000);
+            
+            // Odblokuj po 500ms
+            setTimeout(() => {
+                gameState.isProcessing = false;
+            }, 500);
+        };
+        
+        // Przycisk "Nie pamiętam" - automatycznie włącza policję
+        document.getElementById('forgotBtn').onclick = () => {
+            // Blokada spamu
+            if (gameState.isProcessing) return;
+            gameState.isProcessing = true;
+            
+            document.getElementById('forgotBtnContainer').style.display = 'none';
+            
+            if (gameState.policeMode) {
+                // W trybie policji - od razu łapią
+                showMessage('🚔 NIE PAMIĘTASZ? POLICJA CIĘ ŁAPIE!', 'error');
+                addTerminalLine('');
+                addTerminalLine('<span style="color: #ff0000;">Nie pamiętasz kodu? ZŁAPANY!</span>');
+                setTimeout(() => {
+                    policeCaught();
+                    gameState.isProcessing = false;
+                }, 2000);
+            } else {
+                // Normalny tryb - włącz policję
+                showMessage('🚨 NIE PAMIĘTASZ? POLICJA JEDZIE!', 'error');
+                addTerminalLine('');
+                addTerminalLine('<span style="color: #ff0000;">🚨 Nie pamiętasz hasła? ALARM!</span>');
+                gameState.attempts++;
+                updateUI();
+                setTimeout(() => {
+                    startPoliceMode();
+                    gameState.isProcessing = false;
+                }, 2000);
+            }
+        };
+
+        function checkKeysInput() {
+            const correct = gameState.userInput.join('') === gameState.keysToRemember.join('');
+            
+            if (correct) {
+                gameState.currentMemoryRound++;
+                
+                if (gameState.currentMemoryRound < gameState.memoryRoundsNeeded) {
+                    // Kolejna runda fazy 2
+                    showMessage('✓ SEKWENCJA POPRAWNA!', 'success');
+                    addTerminalLine('');
+                    addTerminalLine('✓ Sekwencja klawiszy zaakceptowana!', true);
+                    addTerminalLine(`Przygotowuję kolejną sekwencję... (${gameState.currentMemoryRound + 1}/${gameState.memoryRoundsNeeded})`);
+                    
+                    setTimeout(() => {
+                        showMemorizePhase();
+                    }, 1500);
+                } else {
+                    // Wszystkie rundy fazy 2 ukończone - przechodź do fazy 3
+                    showMessage('✓ WSZYSTKIE SEKWENCJE POPRAWNE!', 'success');
+                    addTerminalLine('');
+                    addTerminalLine('✓ Wszystkie sekwencje zaakceptowane!', true);
+                    addTerminalLine('Ładowanie kodu do analizy...');
+                    
+                    setTimeout(() => {
+                        showCodePhase();
+                    }, 1500);
+                }
+            } else {
+                // BŁĄD = POLICJA!
+                showMessage('✗ BŁĘDNA SEKWENCJA!', 'error');
+                addTerminalLine('');
+                addTerminalLine('<span style="color: #ff0000;">🚨 WYKRYTO WŁAMANIE! POLICJA JEDZIE!</span>');
+                gameState.attempts++;
+                updateUI();
+                
+                setTimeout(() => {
+                    startPoliceMode();
+                }, 2000);
+            }
         }
-      }
 
-      function missionComplete() {
-        stopTimer();
-
-        const timeSpent = Math.floor((Date.now() - gameState.startTime) / 1000);
-
-        addTerminalLine("");
-        addTerminalLine("═══════════════════════════════════════════");
-        addTerminalLine("🎉 DOSTĘP UZYSKANY! 🎉");
-        addTerminalLine(`Czas: ${timeSpent}s`);
-        addTerminalLine("═══════════════════════════════════════════");
-
-        showMessage("🎉 CEL ZHAKOWANY!", "success");
-
-        gameState.stats.completed++;
-        gameState.stats.totalAttempts += gameState.attempts;
-        gameState.stats.totalTime += timeSpent;
-        gameState.attempts = 0;
-
-        if (gameState.currentMission % 50 === 0) {
-          gameState.stats.rewards++;
-          setTimeout(() => {
-            showMessage(
-              `🏆 NAGRODA ZA ${gameState.currentMission} MISJI!`,
-              "success"
-            );
-          }, 2000);
+        function showCodePhase() {
+            gameState.phase = 'code';
+            gameState.userInput = [];
+            
+            // Pobierz komendę do wpisania z listy
+            gameState.currentCode = gameState.wordsToFind[gameState.currentCodeRound];
+            
+            document.getElementById('phaseIndicator').textContent = 
+                `💻 FAZA 3: PRZEPISZ KOMENDĘ (${gameState.currentCodeRound + 1}/${gameState.codeRoundsNeeded})`;
+            
+            clearTerminal();
+            
+            // Wyświetl kod JS
+            const lines = gameState.finalJSCode.split('\n');
+            lines.forEach(line => {
+                addTerminalLine(line);
+            });
+            
+            addTerminalLine('');
+            addTerminalLine('<span class="command-prompt">root@hacker:~$</span> <span id="codeTarget" style="color: #ffff00;">' + gameState.currentCode + '</span>');
+            
+            // Pokaż input area i klawiaturę
+            document.getElementById('inputArea').style.display = 'block';
+            document.getElementById('inputDisplay').textContent = '';
+            
+            // Ukryj przycisk "Nie pamiętam" w fazie 3
+            document.getElementById('forgotBtnContainer').style.display = 'none';
+            
+            createCodeKeyboard();
         }
 
-        gameState.currentMission++;
-
-        if (gameState.currentMission > TOTAL_MISSIONS) {
-          setTimeout(() => {
-            showMessage(
-              "🏆 GRATULACJE! UKOŃCZYŁEŚ WSZYSTKIE 500 MISJI!",
-              "success"
-            );
-          }, 3000);
-        } else {
-          saveGame();
-          updateUI();
-
-          setTimeout(() => {
-            startMission();
-          }, 3000);
+        function createCodeKeyboard() {
+            const keyboard = document.getElementById('keyboard');
+            keyboard.innerHTML = '';
+            keyboard.style.display = 'grid';
+            keyboard.style.gridTemplateColumns = 'repeat(auto-fit, minmax(45px, 1fr))';
+            
+            const specialKeys = [
+                ['q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p'],
+                ['a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l'],
+                ['z', 'x', 'c', 'v', 'b', 'n', 'm'],
+                ['1', '2', '3', '4', '5', '6', '7', '8', '9', '0'],
+                [' ', '.', ',', '/', '\\', '-', '_', '=', '+', '*'],
+                ['(', ')', '[', ']', '{', '}', '<', '>', '|', '&'],
+                [':', ';', '"', "'", '!', '?', '@', '#', '$', '%']
+            ];
+            
+            specialKeys.forEach(row => {
+                row.forEach(key => {
+                    const button = document.createElement('button');
+                    button.className = 'key-button';
+                    button.textContent = key === ' ' ? 'SPACJA' : key;
+                    button.style.fontSize = 'clamp(12px, 1.8vw, 16px)';
+                    button.style.padding = 'clamp(8px, 2vw, 12px)';
+                    button.onclick = () => addKey(key);
+                    keyboard.appendChild(button);
+                });
+            });
         }
-      }
 
-      function startTimer() {
-        // Używaj zapisanego timeLimit, nie generuj nowej misji!
-        if (gameState.timeLimit === 0) {
-          document.getElementById("timerDisplay").style.display = "none";
-          return;
+        function checkCodeInput() {
+            const userCode = gameState.userInput.join('');
+            const correctCode = gameState.currentCode;
+            
+            if (userCode === correctCode) {
+                addTerminalLine('');
+                addTerminalLine('✓ Kod wykonany pomyślnie!');
+                
+                gameState.currentCodeRound++;
+                
+                if (gameState.currentCodeRound < gameState.codeRoundsNeeded) {
+                    showMessage('✓ KOD POPRAWNY!', 'success');
+                    setTimeout(() => {
+                        showCodePhase();
+                    }, 1500);
+                } else {
+                    showMessage('✓ WSZYSTKIE KODY WYKONANE!', 'success');
+                    setTimeout(() => {
+                        showFinalPhase();
+                    }, 1500);
+                }
+            } else {
+                // BŁĄD = POLICJA!
+                showMessage('❌ BŁĄD W KODZIE!', 'error');
+                addTerminalLine('');
+                addTerminalLine('<span style="color: #ff0000;">🚨 WYKRYTO WŁAMANIE! POLICJA JEDZIE!</span>');
+                gameState.attempts++;
+                updateUI();
+                
+                setTimeout(() => {
+                    startPoliceMode();
+                }, 2000);
+            }
         }
 
-        // Nie startuj nowego timera jeśli już działa
-        if (gameState.timerInterval) return;
+        function showFinalPhase() {
+            gameState.phase = 'final';
+            gameState.userInput = [];
+            
+            // Ustaw aktualne hasło do znalezienia
+            gameState.finalCode = gameState.finalCodes[gameState.currentFinalRound];
+            
+            document.getElementById('phaseIndicator').textContent = 
+                `🔍 FAZA 4: ZNAJDŹ HASŁO (${gameState.currentFinalRound + 1}/${gameState.finalRoundsNeeded})`;
+            
+            clearTerminal();
+            addTerminalLine('═══════════════════════════════════════════');
+            addTerminalLine(`🎯 ZNAJDŹ HASŁO ${gameState.currentFinalRound + 1}/${gameState.finalRoundsNeeded}`);
+            addTerminalLine('═══════════════════════════════════════════');
+            addTerminalLine('');
+            addTerminalLine(`Znajdź key${gameState.currentFinalRound + 1} w kodzie (4 cyfry):`);
+            addTerminalLine('');
+            
+            // Wyświetl kod BEZ podświetlania hasła
+            const lines = gameState.finalJSCode.split('\n');
+            lines.forEach(line => {
+                addTerminalLine(line);
+            });
+            
+            addTerminalLine('');
+            
+            // Pokaż input area i klawiaturę
+            document.getElementById('inputArea').style.display = 'block';
+            document.getElementById('inputDisplay').textContent = '';
+            
+            createNumberKeyboard();
+        }
 
-        const timerDisplay = document.getElementById("timerDisplay");
-        timerDisplay.style.display = "block";
-        timerDisplay.style.color = "#00ff00";
-        timerDisplay.style.borderColor = "#00ff00";
+        function createNumberKeyboard() {
+            const keyboard = document.getElementById('keyboard');
+            keyboard.innerHTML = '';
+            keyboard.style.display = 'grid';
+            keyboard.style.gridTemplateColumns = 'repeat(5, 1fr)';
+            
+            const numbers = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '0'];
+            
+            numbers.forEach(num => {
+                const button = document.createElement('button');
+                button.className = 'key-button';
+                button.textContent = num;
+                button.style.padding = '20px';
+                button.style.fontSize = '20px';
+                button.onclick = () => addKey(num);
+                keyboard.appendChild(button);
+            });
+        }
 
-        let timeLeft = gameState.timeLimit;
-        timerDisplay.textContent = `⏱️ ${timeLeft}s`;
-
-        gameState.timerInterval = setInterval(() => {
-          timeLeft--;
-          timerDisplay.textContent = `⏱️ ${timeLeft}s`;
-
-          if (timeLeft <= 30) {
-            timerDisplay.style.color = "#ffff00";
-            timerDisplay.style.borderColor = "#ffff00";
-          }
-
-          if (timeLeft <= 10) {
-            timerDisplay.style.color = "#ff0000";
-            timerDisplay.style.borderColor = "#ff0000";
-          }
-
-          if (timeLeft <= 0) {
+        function checkFinalInput() {
+            const userCode = gameState.userInput.join('');
+            
+            if (userCode === gameState.finalCode) {
+                gameState.currentFinalRound++;
+                
+                if (gameState.currentFinalRound < gameState.finalRoundsNeeded) {
+                    // Kolejne hasło do znalezienia
+                    showMessage('✓ HASŁO POPRAWNE!', 'success');
+                    setTimeout(() => {
+                        showFinalPhase();
+                    }, 1500);
+                } else {
+                    // Wszystkie hasła znalezione!
+                    // Od poziomu 7+ - FAZA 5 (policja się domyśliła)
+                    const mission = generateMission(gameState.currentMission);
+                    if (mission.difficulty >= 7) {
+                        showMessage('⚠️ POLICJA SIĘ DOMYŚLIŁA!', 'error');
+                        setTimeout(() => {
+                            startPhase5();
+                        }, 2000);
+                    } else {
+                        missionComplete();
+                    }
+                }
+            } else {
+                // BŁĄD = POLICJA!
+                showMessage('❌ BŁĘDNE HASŁO!', 'error');
+                addTerminalLine('');
+                addTerminalLine('<span style="color: #ff0000;">🚨 WYKRYTO WŁAMANIE! POLICJA JEDZIE!</span>');
+                gameState.attempts++;
+                updateUI();
+                
+                setTimeout(() => {
+                    startPoliceMode();
+                }, 2000);
+            }
+        }
+        
+        // ============ FAZA 5 - POLICJA SIĘ DOMYŚLIŁA (poziom 7+) ============
+        
+        const policeEmojis = ['🚔', '🚨', '👮', '🚓', '🔫', '⚠️', '🚒', '🛑', '📢', '🔒'];
+        const wrongEmojis = ['🍕', '🎮', '🌟', '🎵', '🌈', '🐱', '🎂', '💎', '🌺', '🦄', '🍦', '🎪'];
+        
+        function startPhase5() {
+            gameState.phase = 'phase5_commands';
+            gameState.phase5CommandsRound = 0;
+            gameState.phase5CommandsNeeded = 3 + Math.floor(Math.random() * 3); // 3-5 komend
+            gameState.phase5EmojisNeeded = 5; // 5 emotikon do kliknięcia
+            gameState.phase5EmojisClicked = 0;
+            gameState.currentCodeRound = 0;
+            gameState.codeRoundsNeeded = gameState.phase5CommandsNeeded;
+            
+            // Komendy do wpisania
+            const phase5Commands = [
+                'lock(door)',
+                'secure(home)',
+                'close(window)',
+                'arm(alarm)',
+                'hide(evidence)',
+                'delete(logs)',
+                'encrypt(files)'
+            ];
+            gameState.wordsToFind = phase5Commands.slice(0, gameState.phase5CommandsNeeded);
+            
             stopTimer();
-            missionFailed();
-          }
-        }, 1000);
-      }
-
-      function stopTimer() {
-        if (gameState.timerInterval) {
-          clearInterval(gameState.timerInterval);
-          gameState.timerInterval = null;
+            
+            // START EFEKTÓW POLICJI!
+            startPoliceLights();
+            startPoliceSiren();
+            
+            // Start timer 3.5 minuty
+            startPoliceTimer();
+            
+            clearTerminal();
+            addTerminalLine('<span style="color: #ff0000;">🚨🚨🚨 POLICJA SIĘ DOMYŚLIŁA! 🚨🚨🚨</span>');
+            addTerminalLine('');
+            addTerminalLine('<span style="color: #ffff00;">Zhakowanie trudnego celu wzbudziło podejrzenia!</span>');
+            addTerminalLine('Musisz zabezpieczyć dom i ukryć się!');
+            addTerminalLine('');
+            addTerminalLine(`Krok 1: Zamknij dom (${gameState.phase5CommandsNeeded} komendy)`);
+            addTerminalLine('Krok 2: Znajdź emotikony policyjne');
+            
+            document.getElementById('phaseIndicator').textContent = '🚨 FAZA 5: ZAMKNIJ DOM!';
+            
+            setTimeout(() => {
+                showPhase5Commands();
+            }, 2000);
         }
-      }
+        
+        function showPhase5Commands() {
+            gameState.phase = 'phase5_commands';
+            gameState.userInput = [];
+            
+            gameState.currentCode = gameState.wordsToFind[gameState.currentCodeRound];
+            
+            document.getElementById('phaseIndicator').textContent = 
+                `🚨 ZAMKNIJ DOM (${gameState.currentCodeRound + 1}/${gameState.codeRoundsNeeded})`;
+            
+            clearTerminal();
+            addTerminalLine('<span style="color: #ff0000;">🚨 ZABEZPIECZ DOM!</span>');
+            addTerminalLine('');
+            addTerminalLine('function secureHouse() {');
+            gameState.wordsToFind.forEach((cmd, i) => {
+                if (i <= gameState.currentCodeRound) {
+                    addTerminalLine(`    ${cmd};`);
+                }
+            });
+            addTerminalLine('}');
+            addTerminalLine('');
+            addTerminalLine('<span class="command-prompt">root@home:~$</span> <span style="color: #ffff00;">' + gameState.currentCode + '</span>');
+            
+            document.getElementById('inputArea').style.display = 'block';
+            document.getElementById('inputDisplay').textContent = '';
+            document.getElementById('forgotBtnContainer').style.display = 'none';
+            
+            createCodeKeyboard();
+        }
+        
+        function showPhase5Emojis() {
+            gameState.phase = 'phase5_emojis';
+            gameState.phase5EmojisClicked = 0;
+            
+            document.getElementById('phaseIndicator').textContent = 
+                `🚨 ZNAJDŹ EMOTIKONY POLICYJNE (0/${gameState.phase5EmojisNeeded})`;
+            
+            clearTerminal();
+            addTerminalLine('<span style="color: #ff0000;">🚨 OSTATNI KROK!</span>');
+            addTerminalLine('');
+            addTerminalLine('Kliknij wszystkie emotikony związane z policją!');
+            addTerminalLine('Uważaj - kliknięcie złej emotikony = strata czasu!');
+            addTerminalLine('');
+            addTerminalLine(`Znajdź ${gameState.phase5EmojisNeeded} emotikon policyjnych.`);
+            
+            document.getElementById('inputArea').style.display = 'none';
+            
+            // Stwórz siatkę emotikon
+            createEmojiGrid();
+        }
+        
+        function createEmojiGrid() {
+            const keysDisplay = document.getElementById('keysDisplay');
+            keysDisplay.innerHTML = '';
+            keysDisplay.style.display = 'grid';
+            keysDisplay.style.gridTemplateColumns = 'repeat(5, 1fr)';
+            keysDisplay.style.gap = '10px';
+            keysDisplay.style.maxWidth = '400px';
+            keysDisplay.style.margin = '20px auto';
+            
+            // Wybierz 5 policyjnych i 10 złych emotikon
+            const policeToUse = [...policeEmojis].sort(() => Math.random() - 0.5).slice(0, gameState.phase5EmojisNeeded);
+            const wrongToUse = [...wrongEmojis].sort(() => Math.random() - 0.5).slice(0, 10);
+            
+            // Połącz i pomieszaj
+            const allEmojis = [...policeToUse, ...wrongToUse].sort(() => Math.random() - 0.5);
+            
+            gameState.correctEmojis = policeToUse;
+            gameState.clickedEmojis = [];
+            
+            allEmojis.forEach(emoji => {
+                const btn = document.createElement('button');
+                btn.className = 'key-button emoji-btn';
+                btn.textContent = emoji;
+                btn.style.fontSize = '30px';
+                btn.style.padding = '15px';
+                btn.style.cursor = 'pointer';
+                btn.onclick = () => clickEmoji(emoji, btn);
+                keysDisplay.appendChild(btn);
+            });
+        }
+        
+        function clickEmoji(emoji, btn) {
+            if (gameState.clickedEmojis.includes(emoji)) return; // Już kliknięte
+            
+            gameState.clickedEmojis.push(emoji);
+            
+            if (gameState.correctEmojis.includes(emoji)) {
+                // Poprawna emotikona!
+                gameState.phase5EmojisClicked++;
+                btn.style.background = 'linear-gradient(135deg, #00ff00 0%, #00aa00 100%)';
+                btn.style.pointerEvents = 'none';
+                showMessage('✓ POPRAWNA!', 'success');
+                
+                document.getElementById('phaseIndicator').textContent = 
+                    `🚨 ZNAJDŹ EMOTIKONY POLICYJNE (${gameState.phase5EmojisClicked}/${gameState.phase5EmojisNeeded})`;
+                
+                if (gameState.phase5EmojisClicked >= gameState.phase5EmojisNeeded) {
+                    // Wszystkie znalezione!
+                    setTimeout(() => {
+                        phase5Complete();
+                    }, 1000);
+                }
+            } else {
+                // Zła emotikona!
+                btn.style.background = 'linear-gradient(135deg, #ff0000 0%, #aa0000 100%)';
+                btn.style.pointerEvents = 'none';
+                showMessage('✗ ZŁA EMOTIKONA!', 'error');
+            }
+        }
+        
+        function phase5Complete() {
+            stopTimer();
+            stopPoliceLights();
+            stopPoliceSiren();
+            
+            showMessage('✓ UKRYŁEŚ SIĘ PRZED POLICJĄ!', 'success');
+            
+            clearTerminal();
+            addTerminalLine('<span style="color: #00ff00;">✓ POLICJA ODJECHAŁA!</span>');
+            addTerminalLine('');
+            addTerminalLine('Udało Ci się zabezpieczyć dom i ukryć!');
+            addTerminalLine('Misja zakończona sukcesem!');
+            
+            document.getElementById('keysDisplay').style.display = 'none';
+            
+            setTimeout(() => {
+                missionComplete();
+            }, 3000);
+        }
+        
+        function checkPhase5Input() {
+            const userCode = gameState.userInput.join('');
+            
+            if (userCode === gameState.currentCode) {
+                gameState.currentCodeRound++;
+                
+                if (gameState.currentCodeRound < gameState.codeRoundsNeeded) {
+                    showMessage('✓ ZAMKNIĘTE!', 'success');
+                    setTimeout(() => {
+                        showPhase5Commands();
+                    }, 1000);
+                } else {
+                    // Wszystkie komendy - przejdź do emotikon
+                    showMessage('✓ DOM ZABEZPIECZONY!', 'success');
+                    setTimeout(() => {
+                        showPhase5Emojis();
+                    }, 1500);
+                }
+            } else {
+                showMessage('✗ BŁĄD!', 'error');
+                gameState.userInput = [];
+                updateInputDisplay();
+            }
+        }
+        
+        // ============ TRYB POLICJI ============
+        
+        // Dźwięk syreny policyjnej (Web Audio API)
+        let policeAudioContext = null;
+        let policeSiren = null;
+        
+        function startPoliceSiren() {
+            try {
+                policeAudioContext = new (window.AudioContext || window.webkitAudioContext)();
+                policeSiren = policeAudioContext.createOscillator();
+                const gainNode = policeAudioContext.createGain();
+                
+                policeSiren.connect(gainNode);
+                gainNode.connect(policeAudioContext.destination);
+                
+                policeSiren.type = 'sawtooth';
+                gainNode.gain.value = 0.1;
+                
+                // Modulacja syreny
+                policeSiren.frequency.setValueAtTime(600, policeAudioContext.currentTime);
+                
+                const modulateSiren = () => {
+                    if (!policeSiren) return;
+                    const now = policeAudioContext.currentTime;
+                    policeSiren.frequency.setValueAtTime(600, now);
+                    policeSiren.frequency.linearRampToValueAtTime(800, now + 0.5);
+                    policeSiren.frequency.linearRampToValueAtTime(600, now + 1);
+                    setTimeout(modulateSiren, 1000);
+                };
+                
+                policeSiren.start();
+                modulateSiren();
+            } catch(e) {
+                console.log('Audio not supported');
+            }
+        }
+        
+        function stopPoliceSiren() {
+            try {
+                if (policeSiren) {
+                    policeSiren.stop();
+                    policeSiren = null;
+                }
+                if (policeAudioContext) {
+                    policeAudioContext.close();
+                    policeAudioContext = null;
+                }
+            } catch(e) {}
+        }
+        
+        function startPoliceLights() {
+            // Usuń stary overlay jeśli istnieje
+            const oldOverlay = document.getElementById('policeOverlay');
+            if (oldOverlay) oldOverlay.remove();
+            
+            const overlay = document.createElement('div');
+            overlay.id = 'policeOverlay';
+            overlay.className = 'police-overlay';
+            document.body.appendChild(overlay);
+        }
+        
+        function stopPoliceLights() {
+            const overlay = document.getElementById('policeOverlay');
+            if (overlay) overlay.remove();
+        }
+        
+        function startPoliceMode() {
+            // ZAPISZ STAN PRZED POLICJĄ (do przywrócenia po ucieczce)
+            gameState.savedState = {
+                phase: gameState.phase,
+                keysToRemember: [...gameState.keysToRemember],
+                currentMemoryRound: gameState.currentMemoryRound,
+                memoryRoundsNeeded: gameState.memoryRoundsNeeded,
+                currentCodeRound: gameState.currentCodeRound,
+                codeRoundsNeeded: gameState.codeRoundsNeeded,
+                wordsToFind: [...gameState.wordsToFind],
+                currentCode: gameState.currentCode,
+                currentFinalRound: gameState.currentFinalRound,
+                finalRoundsNeeded: gameState.finalRoundsNeeded,
+                finalCode: gameState.finalCode,
+                finalCodes: [...gameState.finalCodes],
+                finalJSCode: gameState.finalJSCode,
+                timeLimit: gameState.timeLimit
+            };
+            
+            gameState.policeMode = true;
+            gameState.phase = 'police_memorize';
+            gameState.homePassword = generateHomePassword();
+            gameState.currentMemoryRound = 0;
+            gameState.currentCodeRound = 0;
+            
+            // Automatycznie 6 znaków w trybie policji
+            gameState.keysToRemember = generateKeys(6);
+            gameState.memoryRoundsNeeded = 1;
+            
+            // Więcej komend do wpisania w trybie policji (zabezpieczanie domu)
+            const policeCommands = [
+                'lock(door)',
+                'secure(home)',
+                'close(window)',
+                'arm(alarm)',
+                'hide(evidence)'
+            ];
+            
+            // Losowa liczba komend (3-5)
+            const numCommands = 3 + Math.floor(Math.random() * 3);
+            gameState.codeRoundsNeeded = numCommands;
+            gameState.wordsToFind = policeCommands.slice(0, numCommands);
+            
+            stopTimer();
+            
+            // START EFEKTÓW POLICJI!
+            startPoliceLights();
+            startPoliceSiren();
+            
+            clearTerminal();
+            addTerminalLine('<span style="color: #ff0000;">🚨🚨🚨 ALARM! POLICJA W DRODZE! 🚨🚨🚨</span>');
+            addTerminalLine('');
+            addTerminalLine('<span style="color: #ff0000;">MUSISZ ZABEZPIECZYĆ DOM!</span>');
+            addTerminalLine(`Masz 3.5 MINUTY na zamknięcie ${numCommands} rzeczy!`);
+            addTerminalLine('');
+            addTerminalLine('Zapamiętaj sekwencję klawiszy:');
+            
+            document.getElementById('phaseIndicator').textContent = '🚨 POLICJA! ZAMKNIJ DRZWI!';
+            
+            // Start 3.5-minutowy timer
+            startPoliceTimer();
+            
+            showPoliceMemorizePhase();
+        }
+        
+        function startPoliceTimer() {
+            // Zatrzymaj poprzedni timer jeśli działa
+            stopTimer();
+            
+            let timeLeft = 210; // 3.5 minuty
+            const timerDisplay = document.getElementById('timerDisplay');
+            timerDisplay.style.display = 'block';
+            timerDisplay.style.color = '#ff0000';
+            timerDisplay.style.borderColor = '#ff0000';
+            timerDisplay.textContent = `🚨 ${timeLeft}s`;
+            
+            gameState.timerInterval = setInterval(() => {
+                timeLeft--;
+                timerDisplay.textContent = `🚨 ${timeLeft}s`;
+                
+                if (timeLeft <= 0) {
+                    stopTimer();
+                    policeCaught();
+                }
+            }, 1000);
+        }
+        
+        function showPoliceMemorizePhase() {
+            gameState.phase = 'police_memorize';
+            
+            document.getElementById('phaseIndicator').textContent = 
+                `🚨 ZAPAMIĘTAJ KOD DRZWI (${gameState.currentMemoryRound + 1}/${gameState.memoryRoundsNeeded})`;
+            
+            const keysDisplay = document.getElementById('keysDisplay');
+            keysDisplay.innerHTML = '';
+            keysDisplay.style.display = 'flex';
+            
+            gameState.keysToRemember.forEach((key, index) => {
+                setTimeout(() => {
+                    const keyElement = document.createElement('div');
+                    keyElement.className = 'key';
+                    keyElement.style.background = 'linear-gradient(135deg, #ff0000 0%, #cc0000 100%)';
+                    keyElement.textContent = key;
+                    keysDisplay.appendChild(keyElement);
+                }, index * 150);
+            });
 
-      function missionFailed() {
-        showMessage("⏰ CZAS MINĄŁ! MISJA NIEUDANA!", "error");
-        gameState.attempts++;
+            document.getElementById('inputArea').style.display = 'none';
+            document.getElementById('readyButton').style.display = 'none';
 
-        setTimeout(() => {
-          startMission();
-        }, 2000);
-      }
-
-      function showMessage(text, type = "success") {
-        const existing = document.querySelector(".message");
-        if (existing) existing.remove();
-
-        const message = document.createElement("div");
-        message.className = `message ${type}`;
-        message.textContent = text;
-        document.body.appendChild(message);
-
-        setTimeout(() => {
-          message.remove();
-        }, 2000);
-      }
-
-      function updateUI() {
-        document.getElementById(
-          "currentMission"
-        ).textContent = `${gameState.currentMission}/${TOTAL_MISSIONS}`;
-        document.getElementById("progressPercent").textContent = `${Math.floor(
-          ((gameState.currentMission - 1) / TOTAL_MISSIONS) * 100
-        )}%`;
-        document.getElementById("attempts").textContent = gameState.attempts;
-
-        const totalMinutes = Math.floor(gameState.stats.totalTime / 60);
-        const totalSeconds = gameState.stats.totalTime % 60;
-        document.getElementById(
-          "totalTime"
-        ).textContent = `${totalMinutes}:${totalSeconds
-          .toString()
-          .padStart(2, "0")}`;
-
-        document.getElementById("completed").textContent =
-          gameState.stats.completed;
-
-        const successRate =
-          gameState.stats.totalAttempts > 0
-            ? Math.floor(
-                (gameState.stats.completed / gameState.stats.totalAttempts) *
-                  100
-              )
-            : 0;
-        document.getElementById("successRate").textContent = `${successRate}%`;
-
-        const avgTime =
-          gameState.stats.completed > 0
-            ? Math.floor(gameState.stats.totalTime / gameState.stats.completed)
-            : 0;
-        document.getElementById("avgTime").textContent = `${avgTime}s`;
-
-        document.getElementById(
-          "rewards"
-        ).textContent = `${gameState.stats.rewards} 🏆`;
-
-        const progress =
-          ((gameState.currentMission - 1) / TOTAL_MISSIONS) * 100;
-        document.getElementById("progressFill").style.width = `${progress}%`;
-      }
-
-      document.addEventListener("keydown", (e) => {
-        // Blokada spamu Enter
-        if (e.key === "Enter" && gameState.isProcessing) {
-          e.preventDefault();
-          return;
+            setTimeout(() => {
+                document.getElementById('readyButton').style.display = 'block';
+            }, gameState.keysToRemember.length * 150 + 500);
+        }
+        
+        function showPoliceInputPhase() {
+            gameState.phase = 'police_input';
+            gameState.userInput = [];
+            
+            document.getElementById('phaseIndicator').textContent = '🚨 WPISZ KOD DRZWI!';
+            document.getElementById('keysDisplay').style.display = 'none';
+            document.getElementById('inputArea').style.display = 'block';
+            document.getElementById('inputDisplay').textContent = '';
+            
+            // Pokaż przycisk "Nie pamiętam" (w trybie policji = od razu łapią)
+            document.getElementById('forgotBtnContainer').style.display = 'block';
+            
+            createKeyboard();
+        }
+        
+        function showPoliceCodePhase() {
+            gameState.phase = 'police_code';
+            gameState.userInput = [];
+            gameState.currentCode = gameState.wordsToFind[gameState.currentCodeRound];
+            
+            document.getElementById('phaseIndicator').textContent = 
+                `🚨 ZAMKNIJ DRZWI (${gameState.currentCodeRound + 1}/${gameState.codeRoundsNeeded})`;
+            
+            clearTerminal();
+            addTerminalLine('<span style="color: #ff0000;">🚨 ZAMYKANIE DRZWI...</span>');
+            addTerminalLine('');
+            addTerminalLine(`function secureDoor() {`);
+            addTerminalLine(`    lock(door);`);
+            addTerminalLine(`    secure(home);`);
+            addTerminalLine(`    password: "${gameState.homePassword}"`);
+            addTerminalLine(`}`);
+            addTerminalLine('');
+            addTerminalLine('<span class="command-prompt">root@home:~$</span> <span style="color: #ffff00;">' + gameState.currentCode + '</span>');
+            
+            document.getElementById('inputArea').style.display = 'block';
+            document.getElementById('inputDisplay').textContent = '';
+            
+            createCodeKeyboard();
+        }
+        
+        function showPoliceFinalPhase() {
+            gameState.phase = 'police_final';
+            gameState.userInput = [];
+            
+            document.getElementById('phaseIndicator').textContent = '🚨 WPISZ HASŁO ZABEZPIECZAJĄCE!';
+            
+            clearTerminal();
+            addTerminalLine('<span style="color: #ff0000;">🚨 OSTATNI KROK - HASŁO DOMU!</span>');
+            addTerminalLine('');
+            addTerminalLine(`function secureDoor() {`);
+            addTerminalLine(`    lock(door);`);
+            addTerminalLine(`    secure(home);`);
+            addTerminalLine(`    password: "${gameState.homePassword}"`);
+            addTerminalLine(`}`);
+            addTerminalLine('');
+            addTerminalLine('Wpisz hasło zabezpieczające (8 znaków):');
+            
+            document.getElementById('inputArea').style.display = 'block';
+            document.getElementById('inputDisplay').textContent = '';
+            
+            createPoliceKeyboard();
+        }
+        
+        function createPoliceKeyboard() {
+            const keyboard = document.getElementById('keyboard');
+            keyboard.innerHTML = '';
+            keyboard.style.display = 'grid';
+            keyboard.style.gridTemplateColumns = 'repeat(auto-fit, minmax(40px, 1fr))';
+            
+            const keys = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'.split('');
+            
+            keys.forEach(key => {
+                const button = document.createElement('button');
+                button.className = 'key-button';
+                button.textContent = key;
+                button.style.background = 'linear-gradient(135deg, #330000 0%, #660000 100%)';
+                button.onclick = () => addKey(key);
+                keyboard.appendChild(button);
+            });
+        }
+        
+        function checkPoliceInput() {
+            if (gameState.phase === 'police_input') {
+                const correct = gameState.userInput.join('') === gameState.keysToRemember.join('');
+                if (correct) {
+                    gameState.currentMemoryRound++;
+                    showMessage('✓ KOD POPRAWNY!', 'success');
+                    setTimeout(() => {
+                        showPoliceCodePhase();
+                    }, 1000);
+                } else {
+                    showMessage('✗ BŁĘDNY KOD!', 'error');
+                    gameState.userInput = [];
+                    updateInputDisplay();
+                }
+            } else if (gameState.phase === 'police_code') {
+                const userCode = gameState.userInput.join('');
+                if (userCode === gameState.currentCode) {
+                    gameState.currentCodeRound++;
+                    if (gameState.currentCodeRound < gameState.codeRoundsNeeded) {
+                        showMessage('✓ DRZWI ZAMKNIĘTE!', 'success');
+                        setTimeout(() => {
+                            showPoliceCodePhase();
+                        }, 1000);
+                    } else {
+                        showMessage('✓ WSZYSTKIE DRZWI ZAMKNIĘTE!', 'success');
+                        setTimeout(() => {
+                            showPoliceFinalPhase();
+                        }, 1000);
+                    }
+                } else {
+                    showMessage('✗ BŁĄD!', 'error');
+                    gameState.userInput = [];
+                    updateInputDisplay();
+                }
+            } else if (gameState.phase === 'police_final') {
+                const userCode = gameState.userInput.join('');
+                if (userCode === gameState.homePassword) {
+                    policeEscaped();
+                } else {
+                    showMessage('✗ BŁĘDNE HASŁO!', 'error');
+                    gameState.userInput = [];
+                    updateInputDisplay();
+                }
+            }
+        }
+        
+        function policeCaught() {
+            stopTimer();
+            stopPoliceLights();
+            stopPoliceSiren();
+            gameState.policeMode = false;
+            
+            // Tracisz 5 zhakowanych misji!
+            gameState.stats.completed = Math.max(0, gameState.stats.completed - 5);
+            
+            showMessage('🚔 POLICJA CIĘ ZŁAPAŁA! -5 MISJI!', 'error');
+            
+            clearTerminal();
+            addTerminalLine('<span style="color: #ff0000;">🚔🚔🚔 ZŁAPANY! 🚔🚔🚔</span>');
+            addTerminalLine('');
+            addTerminalLine('Policja złapała Cię!');
+            addTerminalLine('<span style="color: #ff0000;">Tracisz 5 zhakowanych misji!</span>');
+            addTerminalLine('');
+            addTerminalLine(`Pozostało: ${gameState.stats.completed} misji`);
+            
+            // Ukryj przycisk "nie pamiętam"
+            document.getElementById('forgotBtnContainer').style.display = 'none';
+            
+            saveGame();
+            updateUI();
+            
+            setTimeout(() => {
+                startMission();
+            }, 4000);
+        }
+        
+        function policeEscaped() {
+            stopTimer();
+            stopPoliceLights();
+            stopPoliceSiren();
+            gameState.policeMode = false;
+            
+            showMessage('✓ UCIEKŁEŚ POLICJI!', 'success');
+            
+            clearTerminal();
+            addTerminalLine('<span style="color: #00ff00;">✓ DOM ZABEZPIECZONY!</span>');
+            addTerminalLine('');
+            addTerminalLine('Udało Ci się zamknąć wszystkie drzwi!');
+            addTerminalLine('Policja odjechała.');
+            addTerminalLine('');
+            addTerminalLine('Wracasz do hakowania...');
+            
+            // Ukryj przycisk "nie pamiętam"
+            document.getElementById('forgotBtnContainer').style.display = 'none';
+            
+            // PRZYWRÓĆ STAN SPRZED POLICJI
+            if (gameState.savedState) {
+                setTimeout(() => {
+                    // Przywróć zapisany stan
+                    gameState.phase = gameState.savedState.phase;
+                    gameState.keysToRemember = gameState.savedState.keysToRemember;
+                    gameState.currentMemoryRound = gameState.savedState.currentMemoryRound;
+                    gameState.memoryRoundsNeeded = gameState.savedState.memoryRoundsNeeded;
+                    gameState.currentCodeRound = gameState.savedState.currentCodeRound;
+                    gameState.codeRoundsNeeded = gameState.savedState.codeRoundsNeeded;
+                    gameState.wordsToFind = gameState.savedState.wordsToFind;
+                    gameState.currentCode = gameState.savedState.currentCode;
+                    gameState.currentFinalRound = gameState.savedState.currentFinalRound;
+                    gameState.finalRoundsNeeded = gameState.savedState.finalRoundsNeeded;
+                    gameState.finalCode = gameState.savedState.finalCode;
+                    gameState.finalCodes = gameState.savedState.finalCodes;
+                    gameState.finalJSCode = gameState.savedState.finalJSCode;
+                    gameState.timeLimit = gameState.savedState.timeLimit;
+                    gameState.userInput = [];
+                    gameState.savedState = null;
+                    
+                    // Wróć do odpowiedniej fazy
+                    if (gameState.phase === 'memorize') {
+                        showMemorizePhase();
+                    } else if (gameState.phase === 'input') {
+                        showMemorizePhase(); // Pokaż klawisze od nowa
+                    } else if (gameState.phase === 'code') {
+                        showCodePhase();
+                    } else if (gameState.phase === 'final') {
+                        showFinalPhase();
+                    }
+                }, 3000);
+            } else {
+                setTimeout(() => {
+                    startMission();
+                }, 3000);
+            }
         }
 
-        const validPhases = [
-          "input",
-          "code",
-          "final",
-          "police_input",
-          "police_code",
-          "police_final",
-        ];
-        if (!validPhases.includes(gameState.phase)) return;
-
-        // W fazie code używamy małych liter
-        let key;
-        if (gameState.phase === "code" || gameState.phase === "police_code") {
-          key = e.key.toLowerCase();
-        } else {
-          key = e.key.toUpperCase();
+        function missionComplete() {
+            stopTimer();
+            
+            const timeSpent = Math.floor((Date.now() - gameState.startTime) / 1000);
+            
+            addTerminalLine('');
+            addTerminalLine('═══════════════════════════════════════════');
+            addTerminalLine('🎉 DOSTĘP UZYSKANY! 🎉');
+            addTerminalLine(`Czas: ${timeSpent}s`);
+            addTerminalLine('═══════════════════════════════════════════');
+            
+            showMessage('🎉 CEL ZHAKOWANY!', 'success');
+            
+            gameState.stats.completed++;
+            gameState.stats.totalAttempts += gameState.attempts;
+            gameState.stats.totalTime += timeSpent;
+            gameState.attempts = 0;
+            
+            if (gameState.currentMission % 50 === 0) {
+                gameState.stats.rewards++;
+                setTimeout(() => {
+                    showMessage(`🏆 NAGRODA ZA ${gameState.currentMission} MISJI!`, 'success');
+                }, 2000);
+            }
+            
+            gameState.currentMission++;
+            
+            if (gameState.currentMission > TOTAL_MISSIONS) {
+                setTimeout(() => {
+                    showMessage('🏆 GRATULACJE! UKOŃCZYŁEŚ WSZYSTKIE 100 MISJI!', 'success');
+                }, 3000);
+            } else {
+                saveGame();
+                updateUI();
+                
+                setTimeout(() => {
+                    startMission();
+                }, 3000);
+            }
         }
 
-        if (/^[a-zA-Z0-9]$/.test(key)) {
-          addKey(key);
-        } else if (e.key === " ") {
-          addKey(" ");
-        } else if (e.key === "Backspace") {
-          e.preventDefault();
-          gameState.userInput.pop();
-          updateInputDisplay();
-        } else if (e.key === "Enter") {
-          e.preventDefault();
-          document.getElementById("submitBtn").click();
-        } else if (
-          gameState.phase === "code" ||
-          gameState.phase === "police_code"
-        ) {
-          const specialChars = ".,:;-_()[]{}/<>|&%!?@#$*+='\"\\";
-          if (specialChars.includes(e.key)) {
-            addKey(e.key);
-          }
+        function startTimer() {
+            // Używaj zapisanego timeLimit, nie generuj nowej misji!
+            if (gameState.timeLimit === 0) {
+                document.getElementById('timerDisplay').style.display = 'none';
+                return;
+            }
+            
+            // Nie startuj nowego timera jeśli już działa
+            if (gameState.timerInterval) return;
+            
+            const timerDisplay = document.getElementById('timerDisplay');
+            timerDisplay.style.display = 'block';
+            timerDisplay.style.color = '#00ff00';
+            timerDisplay.style.borderColor = '#00ff00';
+            
+            let timeLeft = gameState.timeLimit;
+            timerDisplay.textContent = `⏱️ ${timeLeft}s`;
+            
+            gameState.timerInterval = setInterval(() => {
+                timeLeft--;
+                timerDisplay.textContent = `⏱️ ${timeLeft}s`;
+                
+                if (timeLeft <= 30) {
+                    timerDisplay.style.color = '#ffff00';
+                    timerDisplay.style.borderColor = '#ffff00';
+                }
+                
+                if (timeLeft <= 10) {
+                    timerDisplay.style.color = '#ff0000';
+                    timerDisplay.style.borderColor = '#ff0000';
+                }
+                
+                if (timeLeft <= 0) {
+                    stopTimer();
+                    missionFailed();
+                }
+            }, 1000);
         }
-      });
 
-      // Sprawdź czy to pierwsza wizyta
-      function checkFirstVisit() {
-        const hasSeenWarning = localStorage.getItem("hackerSimWarning");
-        if (!hasSeenWarning) {
-          document.getElementById("warningOverlay").style.display = "flex";
-        } else {
-          document.getElementById("warningOverlay").style.display = "none";
-          startGame();
+        function stopTimer() {
+            if (gameState.timerInterval) {
+                clearInterval(gameState.timerInterval);
+                gameState.timerInterval = null;
+            }
         }
-      }
 
-      function startGame() {
-        loadGame();
-        setTimeout(() => {
-          startMission();
-        }, 1000);
-      }
+        function missionFailed() {
+            showMessage('⏰ CZAS MINĄŁ! MISJA NIEUDANA!', 'error');
+            gameState.attempts++;
+            
+            setTimeout(() => {
+                startMission();
+            }, 2000);
+        }
 
-      // Przycisk start w ostrzeżeniu
-      document.getElementById("startGameBtn").onclick = () => {
-        localStorage.setItem("hackerSimWarning", "true");
-        document.getElementById("warningOverlay").style.display = "none";
-        startGame();
-      };
+        function showMessage(text, type = 'success') {
+            const existing = document.querySelector('.message');
+            if (existing) existing.remove();
+            
+            const message = document.createElement('div');
+            message.className = `message ${type}`;
+            message.textContent = text;
+            document.body.appendChild(message);
+            
+            setTimeout(() => {
+                message.remove();
+            }, 2000);
+        }
 
-      window.onload = () => {
-        checkFirstVisit();
-      };
+        function updateUI() {
+            document.getElementById('currentMission').textContent = `${gameState.currentMission}/${TOTAL_MISSIONS}`;
+            document.getElementById('progressPercent').textContent = 
+                `${Math.floor((gameState.currentMission - 1) / TOTAL_MISSIONS * 100)}%`;
+            document.getElementById('attempts').textContent = gameState.attempts;
+            
+            const totalMinutes = Math.floor(gameState.stats.totalTime / 60);
+            const totalSeconds = gameState.stats.totalTime % 60;
+            document.getElementById('totalTime').textContent = `${totalMinutes}:${totalSeconds.toString().padStart(2, '0')}`;
+            
+            document.getElementById('completed').textContent = gameState.stats.completed;
+            
+            const successRate = gameState.stats.totalAttempts > 0 
+                ? Math.floor((gameState.stats.completed / gameState.stats.totalAttempts) * 100)
+                : 0;
+            document.getElementById('successRate').textContent = `${successRate}%`;
+            
+            const avgTime = gameState.stats.completed > 0
+                ? Math.floor(gameState.stats.totalTime / gameState.stats.completed)
+                : 0;
+            document.getElementById('avgTime').textContent = `${avgTime}s`;
+            
+            document.getElementById('rewards').textContent = `${gameState.stats.rewards} 🏆`;
+            
+            const progress = ((gameState.currentMission - 1) / TOTAL_MISSIONS) * 100;
+            document.getElementById('progressFill').style.width = `${progress}%`;
+        }
+
+        document.addEventListener('keydown', (e) => {
+            // Blokada spamu Enter
+            if (e.key === 'Enter' && gameState.isProcessing) {
+                e.preventDefault();
+                return;
+            }
+            
+            const validPhases = ['input', 'code', 'final', 'police_input', 'police_code', 'police_final', 'phase5_commands'];
+            if (!validPhases.includes(gameState.phase)) return;
+            
+            // W fazie code używamy małych liter
+            let key;
+            if (gameState.phase === 'code' || gameState.phase === 'police_code' || gameState.phase === 'phase5_commands') {
+                key = e.key.toLowerCase();
+            } else {
+                key = e.key.toUpperCase();
+            }
+            
+            if (/^[a-zA-Z0-9]$/.test(key)) {
+                addKey(key);
+            } else if (e.key === ' ') {
+                addKey(' ');
+            } else if (e.key === 'Backspace') {
+                e.preventDefault();
+                gameState.userInput.pop();
+                updateInputDisplay();
+            } else if (e.key === 'Enter') {
+                e.preventDefault();
+                document.getElementById('submitBtn').click();
+            } else if (gameState.phase === 'code' || gameState.phase === 'police_code' || gameState.phase === 'phase5_commands') {
+                const specialChars = '.,:;-_()[]{}/<>|&%!?@#$*+=\'"\\';
+                if (specialChars.includes(e.key)) {
+                    addKey(e.key);
+                }
+            }
+        });
+
+        // Sprawdź czy to pierwsza wizyta
+        function checkFirstVisit() {
+            const hasSeenWarning = localStorage.getItem('hackerSimWarning');
+            if (!hasSeenWarning) {
+                document.getElementById('warningOverlay').style.display = 'flex';
+            } else {
+                document.getElementById('warningOverlay').style.display = 'none';
+                startGame();
+            }
+        }
+        
+        function startGame() {
+            loadGame();
+            setTimeout(() => {
+                startMission();
+            }, 1000);
+        }
+        
+        // Przycisk start w ostrzeżeniu
+        document.getElementById('startGameBtn').onclick = () => {
+            localStorage.setItem('hackerSimWarning', 'true');
+            document.getElementById('warningOverlay').style.display = 'none';
+            startGame();
+        };
+
+        window.onload = () => {
+            checkFirstVisit();
+        };
     </script>
-  </body>
+</body>
 </html>
