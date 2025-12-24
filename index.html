@@ -3621,10 +3621,18 @@
         stopPoliceSiren();
         gameState.policeMode = false;
 
-        // Tracisz 5 zhakowanych misji!
-        gameState.stats.completed = Math.max(0, gameState.stats.completed - 5);
+        // Tracisz 5 ukończonych misji + cofasz aktualną misję o 5
+        const missionsLost = 5;
+        gameState.stats.completed = Math.max(
+          0,
+          gameState.stats.completed - missionsLost
+        );
+        gameState.currentMission = Math.max(
+          1,
+          gameState.currentMission - missionsLost
+        );
 
-        showMessage("🚔 POLICJA CIĘ ZŁAPAŁA! -5 MISJI!", "error");
+        showMessage(`🚔 POLICJA CIĘ ZŁAPAŁA! -${missionsLost} MISJI!`, "error");
 
         clearTerminal();
         addTerminalLine(
@@ -3633,10 +3641,11 @@
         addTerminalLine("");
         addTerminalLine("Policja złapała Cię!");
         addTerminalLine(
-          '<span style="color: #ff0000;">Tracisz 5 zhakowanych misji!</span>'
+          `<span style="color: #ff0000;">Tracisz ${missionsLost} misji!</span>`
         );
         addTerminalLine("");
-        addTerminalLine(`Pozostało: ${gameState.stats.completed} misji`);
+        addTerminalLine(`Cofasz się do misji: ${gameState.currentMission}`);
+        addTerminalLine(`Ukończone: ${gameState.stats.completed}`);
 
         // Ukryj przycisk "nie pamiętam"
         document.getElementById("forgotBtnContainer").style.display = "none";
@@ -3695,6 +3704,9 @@
             gameState.userInput = [];
             gameState.savedState = null;
 
+            // URUCHOM TIMER PO POWROCIE!
+            startTimer();
+
             // Wróć do odpowiedniej fazy
             if (gameState.phase === "memorize") {
               showMemorizePhase();
@@ -3702,7 +3714,10 @@
               showMemorizePhase(); // Pokaż klawisze od nowa
             } else if (gameState.phase === "code") {
               showCodePhase();
-            } else if (gameState.phase === "final") {
+            } else if (
+              gameState.phase === "final" ||
+              gameState.phase === "catch_game"
+            ) {
               showFinalPhase();
             }
           }, 3000);
