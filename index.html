@@ -1879,15 +1879,15 @@
         catchGameState.isMoving = false;
         cancelAnimationFrame(catchGameState.animationId);
 
-        // Sprawdź czy emotikona jest w ramce lub na linii (z tolerancją 5px)
+        // Sprawdź czy emotikona jest w ramce lub na linii (z tolerancją 10px)
         // Emotikona ma 50px wysokości, ramka 60px
         const emojiTop = catchGameState.emojiY;
         const emojiBottom = catchGameState.emojiY + 50;
         const targetTop = catchGameState.targetY;
         const targetBottom = catchGameState.targetY + 60;
 
-        // Tolerancja 5px - emotikona może wystawać max 5px poza ramkę
-        const tolerance = 5;
+        // Tolerancja 10px - emotikona może wystawać max 10px poza ramkę
+        const tolerance = 10;
 
         if (
           emojiTop >= targetTop - tolerance &&
@@ -2010,10 +2010,10 @@
         );
         addTerminalLine("");
         addTerminalLine('<span style="color: #ff0000;">ZA DUŻO BŁĘDÓW!</span>');
-        addTerminalLine("Masz tylko 30 SEKUND!");
+        addTerminalLine("Masz 2.5 MINUTY!");
 
         document.getElementById("phaseIndicator").textContent =
-          "🚨 POLICJA! 30 SEKUND!";
+          "🚨 POLICJA! 2.5 MIN!";
 
         showPoliceMemorizePhase();
       }
@@ -2021,7 +2021,7 @@
       function startPoliceTimer30s() {
         stopTimer();
 
-        let timeLeft = 30; // TYLKO 30 SEKUND!
+        let timeLeft = 150; // 2.5 minuty
         const timerDisplay = document.getElementById("timerDisplay");
         timerDisplay.style.display = "block";
         timerDisplay.style.color = "#ff0000";
