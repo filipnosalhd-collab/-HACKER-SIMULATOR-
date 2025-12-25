@@ -1167,19 +1167,585 @@
         }
       }
 
+      /* ============ RESPONSYWNOŚĆ - WSZYSTKIE URZĄDZENIA ============ */
+
+      /* Duże ekrany (desktop) */
+      @media (min-width: 1200px) {
+        .container {
+          padding: 25px;
+        }
+
+        .header h1 {
+          font-size: 48px;
+        }
+      }
+
+      /* Tablety i małe laptopy */
+      @media (max-width: 1024px) {
+        .game-area {
+          grid-template-columns: 1fr !important;
+        }
+
+        .sidebar {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 15px;
+        }
+
+        .laptop-3d {
+          max-width: 100%;
+        }
+      }
+
+      /* Tablety */
       @media (max-width: 768px) {
+        .container {
+          padding: 10px;
+        }
+
+        .header {
+          padding: 15px;
+          padding-top: 50px;
+        }
+
+        .header h1 {
+          font-size: 24px;
+          letter-spacing: 1px;
+        }
+
+        .header p {
+          font-size: 12px;
+        }
+
+        .settings-btn {
+          width: 40px;
+          height: 40px;
+          font-size: 18px;
+          top: 10px;
+          right: 10px;
+        }
+
+        .mission-info {
+          grid-template-columns: repeat(2, 1fr);
+          gap: 8px;
+        }
+
+        .info-box {
+          padding: 10px;
+        }
+
+        .info-box h3 {
+          font-size: 9px;
+        }
+
+        .info-box p {
+          font-size: 16px;
+        }
+
+        .sidebar {
+          grid-template-columns: 1fr;
+        }
+
+        .laptop-container {
+          padding: 15px;
+          min-height: 400px;
+        }
+
+        .laptop-screen {
+          min-height: 200px;
+        }
+
+        .screen-content {
+          font-size: 11px;
+        }
+
+        .keys-display {
+          padding: 15px;
+          gap: 10px;
+        }
+
+        .key {
+          padding: 12px 15px;
+          font-size: 18px;
+          min-width: 50px;
+        }
+
         .keyboard {
-          grid-template-columns: repeat(auto-fit, minmax(38px, 1fr));
+          grid-template-columns: repeat(auto-fit, minmax(36px, 1fr));
           gap: 4px;
         }
 
         .key-button {
-          padding: 12px 6px;
-          font-size: 13px;
+          padding: 12px 4px;
+          font-size: 12px;
         }
 
+        .input-display {
+          font-size: 16px;
+          padding: 12px;
+          min-height: 50px;
+        }
+
+        .btn {
+          padding: 12px 15px;
+          font-size: 12px;
+        }
+
+        .action-buttons {
+          gap: 8px;
+        }
+
+        .phase-indicator {
+          font-size: 14px;
+          padding: 12px;
+        }
+
+        .timer {
+          font-size: 24px;
+          padding: 12px;
+        }
+
+        .target-info,
+        .stats-panel {
+          padding: 15px;
+        }
+
+        .target-info h2,
+        .stats-panel h2 {
+          font-size: 16px;
+          margin-bottom: 10px;
+        }
+
+        .target-detail,
+        .stat-item {
+          padding: 8px;
+          font-size: 12px;
+        }
+
+        .progress-bar {
+          height: 20px;
+        }
+
+        .message {
+          padding: 30px 40px;
+          font-size: 20px;
+        }
+
+        .catch-game {
+          height: 280px;
+        }
+
+        .catch-target {
+          width: 60px;
+          height: 60px;
+          font-size: 40px;
+        }
+
+        .catch-emoji {
+          font-size: 45px;
+        }
+
+        .catch-result {
+          font-size: 28px;
+          letter-spacing: 10px;
+        }
+
+        .catch-info {
+          font-size: 14px;
+        }
+      }
+
+      /* Telefony */
+      @media (max-width: 480px) {
         .container {
+          padding: 5px;
+        }
+
+        .header {
           padding: 10px;
+          padding-top: 45px;
+          margin-bottom: 10px;
+        }
+
+        .header h1 {
+          font-size: 18px;
+        }
+
+        .header p {
+          font-size: 10px;
+        }
+
+        .settings-btn {
+          width: 35px;
+          height: 35px;
+          font-size: 16px;
+          top: 8px;
+          right: 8px;
+        }
+
+        .mission-info {
+          grid-template-columns: repeat(2, 1fr);
+          gap: 5px;
+          margin-bottom: 10px;
+        }
+
+        .info-box {
+          padding: 8px 5px;
+          clip-path: none;
+        }
+
+        .info-box h3 {
+          font-size: 8px;
+          margin-bottom: 3px;
+        }
+
+        .info-box p {
+          font-size: 14px;
+        }
+
+        .game-area {
+          gap: 10px;
+        }
+
+        .laptop-container {
+          padding: 10px;
+          min-height: 350px;
+          clip-path: none;
+        }
+
+        .laptop-3d {
+          margin-bottom: 10px;
+        }
+
+        .laptop-screen {
+          min-height: 180px;
+          padding: 10px;
+          border-radius: 5px 5px 0 0;
+        }
+
+        .laptop-base {
+          height: 20px;
+          border-radius: 0 0 5px 5px;
+        }
+
+        .screen-content {
+          font-size: 10px;
+          line-height: 1.4;
+        }
+
+        .keys-display {
+          padding: 10px;
+          gap: 8px;
+          margin: 10px 0;
+          border-radius: 10px;
+        }
+
+        .key {
+          padding: 10px 12px;
+          font-size: 16px;
+          min-width: 45px;
+          border-radius: 6px;
+        }
+
+        .input-area {
+          margin-top: 10px;
+        }
+
+        .input-display {
+          font-size: 14px;
+          padding: 10px;
+          min-height: 45px;
+          margin-bottom: 8px;
+        }
+
+        .keyboard {
+          grid-template-columns: repeat(10, 1fr);
+          gap: 3px;
+        }
+
+        .key-button {
+          padding: 10px 2px;
+          font-size: 11px;
+          border-radius: 4px;
+          border-width: 1px;
+        }
+
+        .action-buttons {
+          gap: 5px;
+          margin-top: 8px;
+        }
+
+        .btn {
+          padding: 10px 8px;
+          font-size: 11px;
+          min-width: 80px;
+          border-radius: 6px;
+        }
+
+        .phase-indicator {
+          font-size: 12px;
+          padding: 10px;
+          margin-bottom: 10px;
+          clip-path: none;
+        }
+
+        .timer {
+          font-size: 20px;
+          padding: 10px;
+          margin-top: 10px;
+          border-radius: 6px;
+        }
+
+        .sidebar {
+          gap: 10px;
+        }
+
+        .target-info,
+        .stats-panel {
+          padding: 12px;
+          clip-path: none;
+        }
+
+        .target-info h2,
+        .stats-panel h2 {
+          font-size: 14px;
+          margin-bottom: 8px;
+        }
+
+        .target-detail,
+        .stat-item {
+          padding: 6px;
+          margin: 6px 0;
+          font-size: 11px;
+        }
+
+        .progress-bar {
+          height: 15px;
+          margin-top: 8px;
+        }
+
+        .message {
+          padding: 25px 30px;
+          font-size: 16px;
+          border-width: 3px;
+          border-radius: 15px;
+        }
+
+        .catch-game {
+          height: 250px;
+          margin: 10px 0;
+          border-radius: 10px;
+        }
+
+        .catch-target {
+          width: 55px;
+          height: 55px;
+          font-size: 35px;
+          border-width: 3px;
+        }
+
+        .catch-emoji {
+          font-size: 40px;
+        }
+
+        .catch-result {
+          font-size: 24px;
+          letter-spacing: 8px;
+          top: 10px;
+        }
+
+        .catch-info {
+          font-size: 12px;
+          margin: 8px 0;
+        }
+
+        .catch-errors {
+          font-size: 12px;
+        }
+
+        .forgot-btn {
+          padding: 10px 20px;
+          font-size: 12px;
+        }
+
+        .emoji-btn {
+          font-size: 24px !important;
+          padding: 10px !important;
+        }
+
+        /* Warning overlay na telefonie */
+        .warning-overlay h1 {
+          font-size: 40px;
+        }
+
+        .warning-overlay p {
+          font-size: 12px;
+          margin-bottom: 20px;
+          padding: 0 10px;
+        }
+
+        .quality-selector {
+          flex-direction: column;
+          gap: 10px;
+          margin: 20px 0;
+        }
+
+        .quality-btn {
+          padding: 12px 25px;
+          font-size: 12px;
+        }
+
+        .quality-label {
+          font-size: 14px;
+        }
+
+        .warning-overlay .start-btn {
+          padding: 18px 50px;
+          font-size: 16px;
+        }
+
+        /* Settings modal na telefonie */
+        .settings-content {
+          padding: 25px;
+          width: 95%;
+        }
+
+        .settings-content h2 {
+          font-size: 22px;
+          margin-bottom: 20px;
+        }
+
+        .settings-close-btn {
+          padding: 12px 40px;
+          font-size: 14px;
+          margin-top: 20px;
+        }
+      }
+
+      /* Bardzo małe telefony */
+      @media (max-width: 360px) {
+        .header h1 {
+          font-size: 16px;
+        }
+
+        .info-box h3 {
+          font-size: 7px;
+        }
+
+        .info-box p {
+          font-size: 12px;
+        }
+
+        .keyboard {
+          grid-template-columns: repeat(10, 1fr);
+          gap: 2px;
+        }
+
+        .key-button {
+          padding: 8px 1px;
+          font-size: 10px;
+        }
+
+        .key {
+          padding: 8px 10px;
+          font-size: 14px;
+          min-width: 40px;
+        }
+
+        .screen-content {
+          font-size: 9px;
+        }
+
+        .catch-game {
+          height: 220px;
+        }
+
+        .catch-target {
+          width: 50px;
+          height: 50px;
+          font-size: 30px;
+        }
+
+        .catch-emoji {
+          font-size: 35px;
+        }
+      }
+
+      /* Landscape mode na telefonach */
+      @media (max-height: 500px) and (orientation: landscape) {
+        .header {
+          padding: 8px;
+          padding-top: 35px;
+        }
+
+        .header h1 {
+          font-size: 16px;
+          margin-bottom: 2px;
+        }
+
+        .header p {
+          display: none;
+        }
+
+        .mission-info {
+          grid-template-columns: repeat(4, 1fr);
+          gap: 5px;
+          margin-bottom: 8px;
+        }
+
+        .info-box {
+          padding: 5px;
+        }
+
+        .info-box h3 {
+          font-size: 8px;
+          margin-bottom: 2px;
+        }
+
+        .info-box p {
+          font-size: 12px;
+        }
+
+        .laptop-container {
+          min-height: auto;
+          padding: 8px;
+        }
+
+        .laptop-screen {
+          min-height: 120px;
+        }
+
+        .keys-display {
+          padding: 8px;
+          margin: 5px 0;
+        }
+
+        .key {
+          padding: 8px 10px;
+          font-size: 14px;
+        }
+
+        .catch-game {
+          height: 180px;
+        }
+
+        .warning-overlay {
+          padding: 10px;
+        }
+
+        .warning-overlay h1 {
+          font-size: 30px;
+          margin-bottom: 10px;
+        }
+
+        .warning-overlay p {
+          font-size: 11px;
+          margin-bottom: 15px;
+        }
+
+        .quality-selector {
+          flex-direction: row;
+          margin: 10px 0;
         }
       }
 
@@ -1504,9 +2070,264 @@
         transform: scale(1.1) !important;
         box-shadow: 0 0 20px rgba(0, 255, 0, 0.5) !important;
       }
+
+      /* Quality selector */
+      .quality-selector {
+        display: flex;
+        gap: 15px;
+        margin: 30px 0;
+        flex-wrap: wrap;
+        justify-content: center;
+      }
+
+      .quality-btn {
+        font-family: "Orbitron", sans-serif;
+        background: linear-gradient(180deg, #1a2a1a 0%, #0a1a0a 100%);
+        border: 3px solid #00ff00;
+        color: #00ff00;
+        padding: 15px 30px;
+        font-size: 14px;
+        font-weight: bold;
+        cursor: pointer;
+        border-radius: 10px;
+        transition: all 0.3s;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+      }
+
+      .quality-btn:hover,
+      .quality-btn.active {
+        background: linear-gradient(180deg, #00ff00 0%, #00aa00 100%);
+        color: #000;
+        box-shadow: 0 0 30px rgba(0, 255, 0, 0.5);
+      }
+
+      .quality-btn.active {
+        transform: scale(1.05);
+      }
+
+      .quality-label {
+        font-family: "Orbitron", sans-serif;
+        color: #00ffff;
+        font-size: 16px;
+        margin-bottom: 10px;
+        text-shadow: 0 0 10px rgba(0, 255, 255, 0.5);
+      }
+
+      /* NISKA JAKOŚĆ - absolutne minimum, zero efektów */
+      body.quality-low,
+      body.quality-low * {
+        animation: none !important;
+        transition: none !important;
+        box-shadow: none !important;
+        text-shadow: none !important;
+        filter: none !important;
+        backdrop-filter: none !important;
+      }
+
+      body.quality-low .matrix-bg,
+      body.quality-low::before,
+      body.quality-low::after {
+        display: none !important;
+      }
+
+      body.quality-low .header::before,
+      body.quality-low .key::before,
+      body.quality-low .btn::before,
+      body.quality-low .key-button::before,
+      body.quality-low .phase-indicator::before,
+      body.quality-low .timer::before,
+      body.quality-low .warning-overlay::before,
+      body.quality-low .warning-overlay .start-btn::before,
+      body.quality-low .catch-game::before,
+      body.quality-low .laptop-container::before,
+      body.quality-low .laptop-container::after,
+      body.quality-low .laptop-screen::before,
+      body.quality-low .target-info::before,
+      body.quality-low .stats-panel::before,
+      body.quality-low .progress-fill::before {
+        display: none !important;
+      }
+
+      body.quality-low {
+        background: #000 !important;
+      }
+
+      body.quality-low .header,
+      body.quality-low .info-box,
+      body.quality-low .laptop-container,
+      body.quality-low .target-info,
+      body.quality-low .stats-panel,
+      body.quality-low .laptop-screen {
+        background: #0a0a0a !important;
+        border: 2px solid #00ff00 !important;
+      }
+
+      body.quality-low .key {
+        background: #00cc00 !important;
+      }
+
+      body.quality-low .btn,
+      body.quality-low .key-button {
+        background: #111 !important;
+      }
+
+      body.quality-low .progress-fill {
+        background: #00ff00 !important;
+      }
+
+      body.quality-low .police-overlay {
+        animation: policeLightsLow 1s infinite !important;
+      }
+
+      @keyframes policeLightsLow {
+        0%,
+        49% {
+          background: rgba(255, 0, 0, 0.3);
+        }
+        50%,
+        100% {
+          background: rgba(0, 0, 255, 0.3);
+        }
+      }
+
+      body.quality-low .catch-game {
+        background: #0a0a0a !important;
+      }
+
+      body.quality-low .catch-target {
+        animation: none !important;
+        background: rgba(0, 255, 0, 0.1) !important;
+      }
+
+      /* ŚREDNIA JAKOŚĆ - podstawowe efekty, bez ciężkich animacji */
+      body.quality-medium .matrix-bg,
+      body.quality-medium::after {
+        display: none !important;
+      }
+
+      body.quality-medium::before {
+        animation: none !important;
+      }
+
+      body.quality-medium .header::before,
+      body.quality-medium .key::before,
+      body.quality-medium .btn::before,
+      body.quality-medium .key-button::before,
+      body.quality-medium .phase-indicator::before,
+      body.quality-medium .timer::before,
+      body.quality-medium .warning-overlay::before,
+      body.quality-medium .laptop-screen::before {
+        display: none !important;
+      }
+
+      body.quality-medium .laptop-inner,
+      body.quality-medium .key,
+      body.quality-medium .progress-fill {
+        animation: none !important;
+      }
+
+      body.quality-medium * {
+        transition-duration: 0.1s !important;
+      }
+
+      body.quality-medium .police-overlay {
+        animation: policeLightsLow 0.5s infinite !important;
+      }
+
+      /* WYSOKA JAKOŚĆ - wszystkie efekty (domyślne) */
+      body.quality-high {
+        /* wszystko włączone */
+      }
+
+      /* Przycisk ustawień */
+      .settings-btn {
+        position: absolute;
+        top: 15px;
+        right: 15px;
+        background: linear-gradient(180deg, #1a2a1a 0%, #0a1a0a 100%);
+        border: 2px solid #00ff00;
+        color: #00ff00;
+        width: 45px;
+        height: 45px;
+        font-size: 20px;
+        cursor: pointer;
+        border-radius: 10px;
+        transition: all 0.3s;
+        z-index: 100;
+      }
+
+      .settings-btn:hover {
+        background: linear-gradient(180deg, #00ff00 0%, #00aa00 100%);
+        color: #000;
+        box-shadow: 0 0 20px rgba(0, 255, 0, 0.5);
+        transform: rotate(90deg);
+      }
+
+      /* Modal ustawień */
+      .settings-modal {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.9);
+        display: none;
+        justify-content: center;
+        align-items: center;
+        z-index: 100000;
+      }
+
+      .settings-content {
+        background: linear-gradient(
+          135deg,
+          rgba(0, 20, 0, 0.98) 0%,
+          rgba(0, 40, 20, 0.98) 100%
+        );
+        border: 4px solid #00ff00;
+        border-radius: 20px;
+        padding: 40px;
+        text-align: center;
+        max-width: 500px;
+        width: 90%;
+        box-shadow: 0 0 50px rgba(0, 255, 0, 0.5),
+          inset 0 0 30px rgba(0, 255, 0, 0.1);
+      }
+
+      .settings-content h2 {
+        font-family: "Orbitron", sans-serif;
+        color: #00ff00;
+        font-size: 28px;
+        margin-bottom: 30px;
+        text-shadow: 0 0 15px rgba(0, 255, 0, 0.8);
+      }
+
+      .settings-close-btn {
+        font-family: "Orbitron", sans-serif;
+        background: linear-gradient(180deg, #00ff00 0%, #00aa00 100%);
+        border: none;
+        color: #000;
+        padding: 15px 50px;
+        font-size: 16px;
+        font-weight: bold;
+        cursor: pointer;
+        border-radius: 10px;
+        margin-top: 30px;
+        transition: all 0.3s;
+        text-transform: uppercase;
+      }
+
+      .settings-close-btn:hover {
+        box-shadow: 0 0 30px rgba(0, 255, 0, 0.7);
+        transform: scale(1.05);
+      }
+
+      .header {
+        position: relative;
+      }
     </style>
   </head>
-  <body>
+  <body class="quality-high">
     <div class="matrix-bg"></div>
 
     <!-- Ostrzeżenie na starcie -->
@@ -1519,11 +2340,42 @@
         Jeśli masz epilepsję lub jesteś wrażliwy na tego typu efekty, zachowaj
         ostrożność.
       </p>
+
+      <div class="quality-label">🎮 WYBIERZ JAKOŚĆ GRAFIKI:</div>
+      <div class="quality-selector">
+        <button class="quality-btn" data-quality="low">🔋 NISKA</button>
+        <button class="quality-btn" data-quality="medium">⚡ ŚREDNIA</button>
+        <button class="quality-btn active" data-quality="high">
+          🔥 WYSOKA
+        </button>
+      </div>
+
       <button class="start-btn" id="startGameBtn">▶ ROZPOCZNIJ GRĘ</button>
+    </div>
+
+    <!-- Modal ustawień -->
+    <div class="settings-modal" id="settingsModal">
+      <div class="settings-content">
+        <h2>⚙️ USTAWIENIA</h2>
+
+        <div class="quality-label">🎮 JAKOŚĆ GRAFIKI:</div>
+        <div class="quality-selector" id="settingsQuality">
+          <button class="quality-btn" data-quality="low">🔋 NISKA</button>
+          <button class="quality-btn" data-quality="medium">⚡ ŚREDNIA</button>
+          <button class="quality-btn active" data-quality="high">
+            🔥 WYSOKA
+          </button>
+        </div>
+
+        <button class="settings-close-btn" id="closeSettingsBtn">
+          ✓ ZAMKNIJ
+        </button>
+      </div>
     </div>
 
     <div class="container">
       <div class="header">
+        <button class="settings-btn" id="openSettingsBtn">⚙️</button>
         <h1>🔐 HACKER SIMULATOR 🔐</h1>
         <p>Zhakuj 100 celów i zostań legendą!</p>
       </div>
@@ -3951,6 +4803,16 @@
       // Sprawdź czy to pierwsza wizyta
       function checkFirstVisit() {
         const hasSeenWarning = localStorage.getItem("hackerSimWarning");
+        const savedQuality = localStorage.getItem("hackerSimQuality");
+
+        // Jeśli gracz nie wybierał jakości - ustaw domyślną dla urządzenia
+        if (!savedQuality) {
+          const defaultQuality = getDefaultQuality();
+          setQuality(defaultQuality, false); // false = nie zapisuj, bo to domyślna
+        } else {
+          setQuality(savedQuality, false);
+        }
+
         if (!hasSeenWarning) {
           document.getElementById("warningOverlay").style.display = "flex";
         } else {
@@ -3958,6 +4820,72 @@
           startGame();
         }
       }
+
+      // Wykryj urządzenie i zwróć domyślną jakość
+      function getDefaultQuality() {
+        const isMobile =
+          /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
+            navigator.userAgent
+          );
+        const isLowEndDevice =
+          navigator.hardwareConcurrency && navigator.hardwareConcurrency <= 4;
+        const isSmallScreen = window.innerWidth < 768;
+        const hasLowMemory =
+          navigator.deviceMemory && navigator.deviceMemory < 4;
+
+        // Telefon lub słabe urządzenie = NISKA
+        if (isMobile || hasLowMemory) {
+          return "low";
+        }
+
+        // Tablet lub średnie urządzenie = ŚREDNIA
+        if (isSmallScreen || isLowEndDevice) {
+          return "medium";
+        }
+
+        // Komputer = WYSOKA
+        return "high";
+      }
+
+      function setQuality(quality, save = true) {
+        document.body.className = `quality-${quality}`;
+
+        // Zapisz tylko jeśli gracz sam wybrał
+        if (save) {
+          localStorage.setItem("hackerSimQuality", quality);
+        }
+
+        // Aktualizuj aktywny przycisk (wszystkie selektory)
+        document.querySelectorAll(".quality-btn").forEach((btn) => {
+          btn.classList.remove("active");
+          if (btn.dataset.quality === quality) {
+            btn.classList.add("active");
+          }
+        });
+      }
+
+      // Obsługa przycisków jakości (warning overlay)
+      document.querySelectorAll(".quality-btn").forEach((btn) => {
+        btn.onclick = () => {
+          setQuality(btn.dataset.quality, true); // true = zapisz wybór gracza
+        };
+      });
+
+      // Obsługa modala ustawień
+      document.getElementById("openSettingsBtn").onclick = () => {
+        document.getElementById("settingsModal").style.display = "flex";
+      };
+
+      document.getElementById("closeSettingsBtn").onclick = () => {
+        document.getElementById("settingsModal").style.display = "none";
+      };
+
+      // Zamknij modal klikając poza nim
+      document.getElementById("settingsModal").onclick = (e) => {
+        if (e.target.id === "settingsModal") {
+          document.getElementById("settingsModal").style.display = "none";
+        }
+      };
 
       function startGame() {
         loadGame();
